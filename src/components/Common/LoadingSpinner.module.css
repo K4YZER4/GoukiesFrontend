@@ -1,0 +1,169 @@
+.spinner_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 248, 244, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+.spinner_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Cookie Container y animación */
+
+.cookie_container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.cookie {
+  width: 100%;
+  height: 100%;
+  animation: spinCookie 3s linear infinite, eatCookie 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(112, 85, 45, 0.2));
+}
+
+/* Estilos del SVG */
+
+.cookie_body {
+  fill: #d4a574;
+  stroke: #9d7e52;
+  stroke-width: 1.5;
+}
+
+.chip {
+  fill: #4a3728;
+  opacity: 1;
+  animation: chipDisappear 3s ease-in-out infinite;
+}
+
+.chip:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.chip:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.chip:nth-child(5) {
+  animation-delay: 0.6s;
+}
+
+.chip:nth-child(6) {
+  animation-delay: 0.8s;
+}
+
+.bite {
+  fill: rgba(255, 248, 244, 0.95);
+  stroke: #9d7e52;
+  stroke-width: 1;
+  opacity: 0;
+  animation: biteCookie 3s ease-in-out infinite;
+}
+
+/* Animaciones */
+
+@keyframes spinCookie {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes eatCookie {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  75% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes chipDisappear {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes biteCookie {
+  0% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Texto de carga */
+
+.spinner_text {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-primary);
+  margin: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 480px) {
+  .cookie_container {
+    width: 100px;
+    height: 100px;
+  }
+
+  .spinner_text {
+    font-size: 14px;
+  }
+}

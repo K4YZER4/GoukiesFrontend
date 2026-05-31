@@ -5,3 +5,6 @@ export { default as Card } from "./Card";
 export { default as Badge } from "./Badge";
 export { default as Modal } from "./Modal";
 export { default as IngredientModal } from "./IngredientModal";
+export { default as Toast, ToastContainer } from "./Toast";
+export { default as LoadingSpinner } from "./LoadingSpinner";
+export { default as ProtectedRoute } from "./ProtectedRoute";

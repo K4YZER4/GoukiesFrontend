@@ -1,5 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
+import { ToastContainer, ProtectedRoute } from './components/Common';
 
 // Import pages
 import { LoginPage, RegisterPage } from './pages/Auth';
@@ -13,43 +16,49 @@ import { CreateProductPage } from './pages/Forms';
 /**
  * App Component
  * Main application component with React Router setup
+ * Wrapped with AuthProvider and ToastProvider for global state
  * 
  * Routes:
- * - /login - Login page
- * - /register - Registration page
- * - /dashboard - Main dashboard (home)
- * - /recetas - All recipes page
- * - /recetas/:id - Single recipe page
- * - /nueva-receta - Create recipe page
- * - /inventario - Products/inventory page
- * - /nuevo-ingrediente - Create product page
+ * - /login - Login page (público)
+ * - /register - Registration page (público)
+ * - /dashboard - Main dashboard (protegido)
+ * - /recetas - All recipes page (protegido)
+ * - /recetas/:id - Single recipe page (protegido)
+ * - /nueva-receta - Create recipe page (protegido)
+ * - /inventario - Products/inventory page (protegido)
+ * - /nuevo-ingrediente - Create product page (protegido)
  * - / - Redirect to dashboard
  */
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Authentication Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+    <AuthProvider>
+      <ToastProvider>
+        <Router>
+          <ToastContainer />
+          <Routes>
+            {/* Authentication Routes - Públicas */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-        {/* Dashboard & Main Routes */}
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Dashboard & Main Routes - Protegidas */}
+            <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* Recipes Routes */}
-        <Route path="/recetas" element={<AllRecipesPage />} />
-        <Route path="/recetas/:id" element={<SelectedRecipePage />} />
-        <Route path="/nueva-receta" element={<CreateRecipePage />} />
+            {/* Recipes Routes - Protegidas */}
+            <Route path="/recetas" element={<ProtectedRoute element={<AllRecipesPage />} />} />
+            <Route path="/recetas/:id" element={<ProtectedRoute element={<SelectedRecipePage />} />} />
+            <Route path="/nueva-receta" element={<ProtectedRoute element={<CreateRecipePage />} />} />
 
-        {/* Inventory/Products Routes */}
-        <Route path="/inventario" element={<AllProductsPage />} />
-        <Route path="/nuevo-ingrediente" element={<CreateProductPage />} />
+            {/* Inventory/Products Routes - Protegidas */}
+            <Route path="/inventario" element={<ProtectedRoute element={<AllProductsPage />} />} />
+            <Route path="/nuevo-ingrediente" element={<ProtectedRoute element={<CreateProductPage />} />} />
 
-        {/* 404 - Not Found (redirect to dashboard) */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </Router>
+            {/* 404 - Not Found (redirect to dashboard) */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Router>
+      </ToastProvider>
+    </AuthProvider>
   );
 };
 

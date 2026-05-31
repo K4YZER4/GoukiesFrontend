@@ -1,36 +1,114 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import styles from './RegisterPage.module.css';
 import { Input } from '../../components';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import authService from '../../services/authService';
 
 /**
  * RegisterPage Component
  * User registration page
+ * Conecta a POST /users/create y auto-login después
  */
-const RegisterPage = ({ onRegisterSuccess = null, onNavigateToLogin = null }) => {
+const RegisterPage = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { success, error } = useToast();
+
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
+    nombre: '',
+    correo_electronico: '',
     password: '',
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  /**
+   * Validaciones básicas
+   */
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.nombre.trim()) {
+      newErrors.nombre = 'El nombre es requerido';
+    } else if (formData.nombre.trim().length < 3) {
+      newErrors.nombre = 'El nombre debe tener al menos 3 caracteres';
+    }
+
+    if (!formData.correo_electronico.trim()) {
+      newErrors.correo_electronico = 'El email es requerido';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo_electronico)) {
+      newErrors.correo_electronico = 'Email inválido';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'La contraseña es requerida';
+    } else if (formData.password.length < 4) {
+      newErrors.password = 'La contraseña debe tener al menos 4 caracteres';
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Limpiar errores cuando el usuario empieza a escribir
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar antes de enviar
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
     try {
-      console.log('Register attempt:', formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      if (onRegisterSuccess) {
-        onRegisterSuccess(formData);
-      }
-    } catch (error) {
-      console.error('Register error:', error);
+      // Llamar a la API para crear usuario
+      const response = await authService.register(
+        formData.nombre,
+        formData.correo_electronico,
+        formData.password,
+        'MXN' // moneda por defecto
+      );
+
+      // El backend devuelve el usuario creado
+      // Auto-login: convertir la respuesta al formato que espera login
+      const userData = {
+        id: response.id,
+        nombre: response.nombre,
+        correo_electronico: response.correo_electronico,
+      };
+
+      login(userData);
+
+      // Mostrar toast de éxito
+      success(`¡Bienvenido ${userData.nombre}! Tu cuenta ha sido creada.`);
+
+      // Redirigir a dashboard (en lugar de login)
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      console.error('Register error:', err);
+
+      // Mostrar error específico
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Error al crear la cuenta. Intenta de nuevo.';
+
+      error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -72,14 +150,17 @@ const RegisterPage = ({ onRegisterSuccess = null, onNavigateToLogin = null }) =>
               <label className={styles.form_label}>Nombre Completo</label>
               <Input
                 type="text"
-                name="fullName"
+                name="nombre"
                 icon="person"
                 placeholder="Tu nombre"
-                value={formData.fullName}
+                value={formData.nombre}
                 onChange={handleInputChange}
                 required
                 fullWidth
               />
+              {errors.nombre && (
+                <span className={styles.error_message}>{errors.nombre}</span>
+              )}
             </div>
 
             {/* Email Field */}
@@ -87,14 +168,17 @@ const RegisterPage = ({ onRegisterSuccess = null, onNavigateToLogin = null }) =>
               <label className={styles.form_label}>Correo Electrónico</label>
               <Input
                 type="email"
-                name="email"
+                name="correo_electronico"
                 icon="mail"
                 placeholder="ejemplo@correo.com"
-                value={formData.email}
+                value={formData.correo_electronico}
                 onChange={handleInputChange}
                 required
                 fullWidth
               />
+              {errors.correo_electronico && (
+                <span className={styles.error_message}>{errors.correo_electronico}</span>
+              )}
             </div>
 
             {/* Password Field */}
@@ -110,6 +194,9 @@ const RegisterPage = ({ onRegisterSuccess = null, onNavigateToLogin = null }) =>
                 required
                 fullWidth
               />
+              {errors.password && (
+                <span className={styles.error_message}>{errors.password}</span>
+              )}
             </div>
 
             {/* Confirm Password Field */}
@@ -125,6 +212,9 @@ const RegisterPage = ({ onRegisterSuccess = null, onNavigateToLogin = null }) =>
                 required
                 fullWidth
               />
+              {errors.confirmPassword && (
+                <span className={styles.error_message}>{errors.confirmPassword}</span>
+              )}
             </div>
 
             {/* Register Button */}
@@ -133,7 +223,7 @@ const RegisterPage = ({ onRegisterSuccess = null, onNavigateToLogin = null }) =>
               className={styles.register_button}
               disabled={isLoading}
             >
-              <span>Registrarse</span>
+              <span>{isLoading ? 'Creando cuenta...' : 'Registrarse'}</span>
               <span className="material-symbols-outlined">arrow_forward</span>
             </button>
           </form>
@@ -146,12 +236,9 @@ const RegisterPage = ({ onRegisterSuccess = null, onNavigateToLogin = null }) =>
           </div>
 
           {/* Login button */}
-          <button
-            className={styles.login_link_button}
-            onClick={onNavigateToLogin}
-          >
+          <Link to="/login" className={styles.login_link_button}>
             Iniciar Sesión
-          </button>
+          </Link>
         </main>
 
         {/* Footer */}
