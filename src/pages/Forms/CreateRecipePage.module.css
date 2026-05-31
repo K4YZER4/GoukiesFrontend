@@ -28,7 +28,7 @@
   background-color: var(--color-surface-container-low);
   border: 2px solid var(--color-border);
   border-radius: 8px;
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--color-text-secondary);
@@ -625,7 +625,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-family: '\''Bricolage Grotesque'\'', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 16px;
   font-weight: 700;
   line-height: 1;
@@ -641,7 +641,7 @@
   background-color: var(--color-surface-container-low);
   border: 2px solid var(--color-border);
   border-radius: 8px;
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--color-text-primary);
@@ -684,7 +684,7 @@
   color: var(--color-primary);
   border: 2px solid var(--color-border);
   border-radius: 9999px;
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -715,7 +715,7 @@
   border: none;
   border-bottom: 3px solid #5b421c;
   border-radius: 9999px;
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -791,7 +791,7 @@
 }
 
 .preview_title {
-  font-family: '\''Bricolage Grotesque'\'', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 18px;
   font-weight: 600;
   color: var(--color-primary);
@@ -805,7 +805,7 @@
 }
 
 .preview_description {
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--color-text-secondary);
@@ -830,7 +830,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: '\''Courier Prime'\'', monospace;
+  font-family: 'Courier Prime', monospace;
   font-size: 12px;
   font-weight: 400;
   color: var(--color-text-secondary);

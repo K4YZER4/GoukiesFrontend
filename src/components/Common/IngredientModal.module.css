@@ -30,7 +30,7 @@
   background-color: var(--color-surface-container-low);
   border: 2px solid var(--color-border);
   border-radius: 8px;
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 16px;
   font-weight: 400;
   color: var(--color-text-primary);
@@ -77,7 +77,7 @@
   color: var(--color-text-secondary);
   border: 2px solid transparent;
   border-radius: 9999px;
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -166,7 +166,7 @@
 }
 
 .ingredient_name {
-  font-family: '\''Bricolage Grotesque'\'', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: var(--color-text-primary);
@@ -185,14 +185,14 @@
   background-color: var(--color-surface-container-high);
   color: var(--color-text-secondary);
   border-radius: 4px;
-  font-family: '\''Courier Prime'\'', monospace;
+  font-family: 'Courier Prime', monospace;
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.02em;
 }
 
 .ingredient_quantity {
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--color-text-secondary);
@@ -227,7 +227,7 @@
 }
 
 .no_results p {
-  font-family: '\''Work Sans'\'', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   font-size: 16px;
   font-weight: 400;
   color: var(--color-text-secondary);
