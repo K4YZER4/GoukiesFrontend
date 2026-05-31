@@ -1,0 +1,401 @@
+/* ==========================================
+   DASHBOARD PAGE STYLES
+   ========================================== */
+
+.dashboard_page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+/* ==========================================
+   MAIN CONTENT AREA
+   ========================================== */
+
+.dashboard_main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-bottom: 5rem; /* Space for mobile bottom nav */
+}
+
+.dashboard_container {
+  max-width: var(--max-width-2xl);
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--spacing-margin-page);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-margin-page);
+}
+
+/* ==========================================
+   WELCOME SECTION
+   ========================================== */
+
+.dashboard_welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dashboard_welcome_title {
+  font-family: var(--font-headline);
+  font-size: var(--font-size-headline-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dashboard_welcome_subtitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-on-surface-variant);
+  margin: 0;
+  max-width: 32rem;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   STATS GRID
+   ========================================== */
+
+.dashboard_stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-gutter-md);
+}
+
+/* ==========================================
+   FEATURED RECIPE SECTION
+   ========================================== */
+
+.dashboard_featured {
+  position: relative;
+  height: 20rem;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-dough);
+  border: 2px solid var(--color-outline);
+  group: hover;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.dashboard_featured:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-dough-lg);
+}
+
+.dashboard_featured_image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.dashboard_featured:hover .dashboard_featured_image {
+  transform: scale(1.05);
+}
+
+.dashboard_featured_overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
+  pointer-events: none;
+}
+
+.dashboard_featured_content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-margin-page);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 2;
+}
+
+.dashboard_featured_badge {
+  display: inline-block;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 0.375rem 1rem;
+  border-radius: var(--border-radius-full);
+  font-family: var(--font-label);
+  font-size: var(--font-size-label-md);
+  font-weight: var(--font-weight-medium);
+  width: fit-content;
+  box-shadow: var(--shadow-lg);
+}
+
+.dashboard_featured_title {
+  font-family: var(--font-headline);
+  font-size: var(--font-size-headline-lg);
+  color: white;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dashboard_featured_description {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 32rem;
+}
+
+/* ==========================================
+   SECTION HEADERS
+   ========================================== */
+
+.dashboard_section_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard_section_title {
+  font-family: var(--font-headline);
+  font-size: var(--font-size-headline-md);
+  color: var(--color-primary);
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.dashboard_view_all_btn,
+.dashboard_add_ingredient_btn {
+  background: none;
+  border: none;
+  font-family: var(--font-button);
+  font-size: var(--font-size-button-text);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+}
+
+.dashboard_view_all_btn:hover,
+.dashboard_add_ingredient_btn:hover {
+  text-decoration-color: var(--color-primary);
+}
+
+.dashboard_add_ingredient_btn {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 0.5rem 1.5rem;
+  border-radius: var(--border-radius-full);
+  text-decoration: none;
+  border-bottom: 4px solid var(--color-primary-container);
+  box-shadow: var(--shadow-dough);
+}
+
+.dashboard_add_ingredient_btn:hover {
+  background-color: #8b6d43;
+  text-decoration: none;
+}
+
+.dashboard_add_ingredient_btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+/* ==========================================
+   RECIPES GRID
+   ========================================== */
+
+.dashboard_recipes_section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gutter-md);
+}
+
+.dashboard_recipes_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-card-gap);
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+/* ==========================================
+   INVENTORY TABLE
+   ========================================== */
+
+.dashboard_inventory_section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gutter-md);
+  background-color: var(--color-surface-container-low);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  border: 2px solid var(--color-outline-variant);
+  box-shadow: var(--shadow-dough);
+}
+
+.dashboard_inventory_table {
+  overflow-x: auto;
+}
+
+.dashboard_inventory_table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard_inventory_table thead {
+  border-bottom: 2px solid var(--color-surface-container-highest);
+}
+
+.dashboard_inventory_table th {
+  padding: 1rem;
+  text-align: left;
+  font-family: var(--font-label);
+  font-size: var(--font-size-label-md);
+  color: var(--color-on-surface-variant);
+  font-weight: var(--font-weight-regular);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.dashboard_inventory_table tbody tr {
+  border-top: 2px solid var(--color-surface-container-highest);
+  transition: all var(--transition-normal);
+}
+
+.dashboard_inventory_table tbody tr:hover {
+  background-color: var(--color-surface-container);
+}
+
+.dashboard_inventory_table td {
+  padding: 1rem;
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  color: var(--color-on-surface);
+}
+
+.inventory_name {
+  font-weight: var(--font-weight-medium);
+}
+
+.inventory_badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--color-surface-container-highest);
+  color: var(--color-on-surface);
+  border-radius: var(--border-radius-full);
+  font-family: var(--font-label);
+  font-size: 12px;
+  border: 1px solid var(--color-outline-variant);
+}
+
+.inventory_quantity {
+  font-family: var(--font-label);
+  font-weight: var(--font-weight-medium);
+}
+
+.inventory_status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-label);
+  font-size: var(--font-size-label-md);
+}
+
+.inventory_status_dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.status_success {
+  background-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.status_warning {
+  background-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+  .dashboard_container {
+    padding: var(--spacing-gutter-md);
+    gap: var(--spacing-gutter-md);
+  }
+
+  .dashboard_welcome_title {
+    font-size: var(--font-size-headline-lg-mobile);
+  }
+
+  .dashboard_stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard_featured {
+    height: 16rem;
+  }
+
+  .dashboard_section_header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard_recipes_grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .dashboard_inventory_table {
+    font-size: 14px;
+  }
+
+  .dashboard_inventory_table th,
+  .dashboard_inventory_table td {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard_main {
+    padding-bottom: 6rem;
+  }
+
+  .dashboard_container {
+    padding: var(--spacing-gutter-sm);
+    gap: var(--spacing-gutter-sm);
+  }
+
+  .dashboard_welcome_title {
+    font-size: 24px;
+  }
+
+  .dashboard_recipes_grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard_featured {
+    height: 12rem;
+  }
+
+  .dashboard_featured_content {
+    padding: var(--spacing-gutter-md);
+  }
+
+  .dashboard_inventory_table {
+    overflow-x: scroll;
+  }
+}

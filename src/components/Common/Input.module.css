@@ -1,0 +1,104 @@
+/* ==========================================
+   INPUT COMPONENT STYLES
+   ========================================== */
+
+.input_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input_label {
+  font-family: var(--font-label);
+  font-size: var(--font-size-label-md);
+  color: var(--color-on-surface-variant);
+  font-weight: var(--font-weight-regular);
+  display: block;
+  margin-left: 0.5rem;
+  transition: all var(--transition-normal);
+}
+
+.input_container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  padding-left: 2.75rem;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-surface-container-highest);
+  border-radius: var(--border-radius-full);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  color: var(--color-on-surface);
+  transition: all var(--transition-normal);
+}
+
+.input::placeholder {
+  color: var(--color-outline-variant);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(112, 85, 45, 0.1);
+  background-color: var(--color-surface-bright);
+}
+
+.input:disabled {
+  background-color: var(--color-surface-container-low);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.input_with_icon {
+  padding-left: 2.75rem;
+}
+
+.input_icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-secondary);
+  font-size: 1.25rem;
+  pointer-events: none;
+}
+
+/* ==========================================
+   ERROR STATE
+   ========================================== */
+
+.input_error {
+  border-color: var(--color-error);
+  background-color: rgba(186, 26, 26, 0.05);
+}
+
+.input_error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 4px rgba(186, 26, 26, 0.1);
+}
+
+.input_error_text {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-error);
+  margin-left: 0.5rem;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+  .input {
+    padding: 0.75rem 1rem;
+    font-size: 16px;
+  }
+}

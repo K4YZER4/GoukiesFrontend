@@ -1,0 +1,235 @@
+.ingredient_modal_content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 400px;
+}
+
+/* Search Section */
+.search_section {
+  flex-shrink: 0;
+}
+
+.search_input_wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search_icon {
+  position: absolute;
+  left: 12px;
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.search_input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  background-color: var(--color-surface-container-low);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-family: '\''Work Sans'\'', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.search_input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(112, 85, 45, 0.1);
+}
+
+.search_input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* Categories Filter */
+.categories_section {
+  flex-shrink: 0;
+  border-bottom: 2px solid var(--color-surface-container-high);
+  padding-bottom: 12px;
+}
+
+.categories_scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.categories_scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.categories_scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.category_filter {
+  padding: 8px 16px;
+  background-color: var(--color-surface-container-high);
+  color: var(--color-text-secondary);
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  font-family: '\''Work Sans'\'', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category_filter:hover {
+  background-color: var(--color-surface-container);
+  border-color: var(--color-border);
+}
+
+.category_filter_active {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.category_count {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* Ingredients List */
+.ingredients_list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ingredients_list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ingredients_list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ingredients_list::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.ingredients_list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+/* Ingredient Item */
+.ingredient_item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-surface-container-high);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.ingredient_item:last-child {
+  border-bottom: none;
+}
+
+.ingredient_item:hover {
+  background-color: var(--color-surface-container-high);
+}
+
+.ingredient_item:active {
+  transform: scale(0.98);
+}
+
+.ingredient_info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ingredient_name {
+  font-family: '\''Bricolage Grotesque'\'', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+.ingredient_details {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.ingredient_category {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: var(--color-surface-container-high);
+  color: var(--color-text-secondary);
+  border-radius: 4px;
+  font-family: '\''Courier Prime'\'', monospace;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.ingredient_quantity {
+  font-family: '\''Work Sans'\'', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.ingredient_arrow {
+  font-size: 20px;
+  color: var(--color-primary);
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.ingredient_item:hover .ingredient_arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* No Results */
+.no_results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.no_results span {
+  font-size: 48px;
+  color: var(--color-border);
+  margin-bottom: 12px;
+}
+
+.no_results p {
+  font-family: '\''Work Sans'\'', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  margin: 0;
+}

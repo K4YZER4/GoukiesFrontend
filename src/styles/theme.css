@@ -1,0 +1,189 @@
+/* ==========================================
+   SPACING & LAYOUT TOKENS
+   ========================================== */
+
+:root {
+  /* BASE UNIT */
+  --unit: 8px;
+
+  /* SPACING */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* CUSTOM SPACING */
+  --spacing-gutter-sm: 16px;
+  --spacing-gutter-md: 24px;
+  --spacing-container-padding: 24px;
+  --spacing-margin-page: 32px;
+  --spacing-card-gap: 20px;
+
+  /* BORDER RADIUS */
+  --border-radius-sm: 0.5rem;
+  --border-radius-md: 1rem;
+  --border-radius-lg: 2rem;
+  --border-radius-xl: 3rem;
+  --border-radius-full: 9999px;
+
+  /* BORDER WIDTH */
+  --border-width-thin: 1px;
+  --border-width-normal: 2px;
+  --border-width-thick: 3px;
+
+  /* SHADOWS - "Dough Shadow" */
+  --shadow-dough: 0 4px 12px rgba(139, 109, 67, 0.15);
+  --shadow-dough-lg: 0 8px 24px rgba(139, 109, 67, 0.15);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 12px 16px rgba(0, 0, 0, 0.15);
+
+  /* Z-INDEX */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-tooltip: 70;
+
+  /* TRANSITIONS */
+  --transition-fast: 100ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* MAX WIDTHS */
+  --max-width-sm: 640px;
+  --max-width-md: 768px;
+  --max-width-lg: 1024px;
+  --max-width-xl: 1280px;
+  --max-width-2xl: 1536px;
+}
+
+/* ==========================================
+   SHADOW UTILITIES
+   ========================================== */
+
+.shadow-dough {
+  box-shadow: var(--shadow-dough);
+}
+
+.shadow-dough-lg {
+  box-shadow: var(--shadow-dough-lg);
+}
+
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ==========================================
+   BORDER UTILITIES
+   ========================================== */
+
+.border-primary {
+  border: var(--border-width-normal) solid var(--color-primary);
+}
+
+.border-outline {
+  border: var(--border-width-normal) solid var(--color-outline);
+}
+
+.border-outline-variant {
+  border: var(--border-width-normal) solid var(--color-outline-variant);
+}
+
+.cookie-border {
+  border: var(--border-width-normal) solid var(--color-outline-variant);
+  border-radius: var(--border-radius-md);
+}
+
+.cookie-border-dark {
+  border: var(--border-width-normal) solid var(--color-primary-container);
+  border-radius: var(--border-radius-md);
+}
+
+/* ==========================================
+   BORDER RADIUS UTILITIES
+   ========================================== */
+
+.rounded-sm {
+  border-radius: var(--border-radius-sm);
+}
+
+.rounded-md {
+  border-radius: var(--border-radius-md);
+}
+
+.rounded-lg {
+  border-radius: var(--border-radius-lg);
+}
+
+.rounded-xl {
+  border-radius: var(--border-radius-xl);
+}
+
+.rounded-full {
+  border-radius: var(--border-radius-full);
+}
+
+/* ==========================================
+   SPACING UTILITIES
+   ========================================== */
+
+.p-container {
+  padding: var(--spacing-container-padding);
+}
+
+.p-margin-page {
+  padding: var(--spacing-margin-page);
+}
+
+.gap-gutter-sm {
+  gap: var(--spacing-gutter-sm);
+}
+
+.gap-gutter-md {
+  gap: var(--spacing-gutter-md);
+}
+
+.gap-card-gap {
+  gap: var(--spacing-card-gap);
+}
+
+/* ==========================================
+   PRESSED/ACTIVE BUTTON EFFECT
+   ========================================== */
+
+.btn-press:active {
+  transform: translateY(2px);
+}
+
+.btn-press-effect {
+  border-bottom: 4px solid currentColor;
+  transition: all var(--transition-fast);
+}
+
+.btn-press-effect:active {
+  border-bottom: 2px solid currentColor;
+  transform: translateY(2px);
+}
+
+/* ==========================================
+   FOCUS STATES
+   ========================================== */
+
+.input-focus:focus {
+  outline: none;
+  border-width: 3px;
+  box-shadow: 0 0 0 4px rgba(112, 85, 45, 0.1);
+}

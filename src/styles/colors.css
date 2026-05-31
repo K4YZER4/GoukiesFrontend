@@ -1,0 +1,123 @@
+/* ==========================================
+   COLOR PALETTE - GOUKIES THEME
+   ========================================== */
+
+:root {
+  /* PRIMARY COLORS */
+  --color-primary: #70552d;
+  --color-primary-dim: #e6c190;
+  --color-primary-fixed: #ffddb2;
+  --color-primary-container: #8b6d43;
+  --color-on-primary: #ffffff;
+  --color-on-primary-fixed: #291800;
+  --color-on-primary-fixed-variant: #5b421c;
+  --color-on-primary-container: #fff7f1;
+
+  /* SECONDARY COLORS */
+  --color-secondary: #695d46;
+  --color-secondary-container: #efdec0;
+  --color-secondary-fixed: #f2e0c3;
+  --color-secondary-fixed-dim: #d5c5a8;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-fixed: #231a08;
+  --color-on-secondary-container: #6d614a;
+  --color-on-secondary-fixed-variant: #504530;
+
+  /* TERTIARY COLORS */
+  --color-tertiary: #5d5953;
+  --color-tertiary-container: #76726b;
+  --color-tertiary-fixed: #e7e2d9;
+  --color-tertiary-fixed-dim: #cbc6bd;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-fixed: #1d1b16;
+  --color-on-tertiary-fixed-variant: #494640;
+  --color-on-tertiary-container: #fef8ef;
+
+  /* SURFACE COLORS */
+  --color-surface: #fff8f4;
+  --color-surface-bright: #fff8f4;
+  --color-surface-container: #ffebd5;
+  --color-surface-container-low: #fff1e5;
+  --color-surface-container-high: #fde4c9;
+  --color-surface-container-highest: #f7dfc4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-dim: #eed6bc;
+  --color-surface-tint: #755931;
+  --color-surface-variant: #f7dfc4;
+
+  /* BACKGROUND & ON-SURFACE */
+  --color-background: #fff8f4;
+  --color-on-background: #251909;
+  --color-on-surface: #251909;
+  --color-on-surface-variant: #4e453b;
+
+  /* ERROR & INVERSE */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-inverse-surface: #3c2e1c;
+  --color-inverse-on-surface: #ffeedd;
+  --color-inverse-primary: #e6c190;
+
+  /* OUTLINE */
+  --color-outline: #80756a;
+  --color-outline-variant: #d1c4b7;
+
+  /* UTILITY COLORS */
+  --color-success: #2d8a5c;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+}
+
+/* ==========================================
+   SEMANTIC COLOR CLASSES
+   ========================================== */
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-primary-fixed {
+  background-color: var(--color-primary-fixed);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-surface {
+  background-color: var(--color-surface);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-on-surface {
+  color: var(--color-on-surface);
+}
+
+.text-on-surface-variant {
+  color: var(--color-on-surface-variant);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+.border-primary {
+  border-color: var(--color-primary);
+}
+
+.border-outline {
+  border-color: var(--color-outline);
+}
+
+.border-outline-variant {
+  border-color: var(--color-outline-variant);
+}

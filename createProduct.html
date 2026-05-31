@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="es" style="">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&amp;family=Work+Sans:wght@400;600&amp;family=Courier+Prime&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#fff7f1",
+              "surface-dim": "#eed6bc",
+              "on-secondary-container": "#6d614a",
+              background: "#fff8f4",
+              error: "#ba1a1a",
+              "surface-container-high": "#fde4c9",
+              "tertiary-container": "#76726b",
+              tertiary: "#5d5953",
+              "surface-bright": "#fff8f4",
+              "surface-container-lowest": "#ffffff",
+              "on-primary": "#ffffff",
+              "on-primary-fixed-variant": "#5b421c",
+              "on-error": "#ffffff",
+              "primary-container": "#8b6d43",
+              "inverse-on-surface": "#ffeedd",
+              "outline-variant": "#d1c4b7",
+              "on-primary-fixed": "#291800",
+              "on-background": "#251909",
+              "on-surface-variant": "#4e453b",
+              "on-tertiary-container": "#fef8ef",
+              "on-surface": "#251909",
+              surface: "#fff8f4",
+              "error-container": "#ffdad6",
+              "surface-variant": "#f7dfc4",
+              "surface-container-highest": "#f7dfc4",
+              "inverse-surface": "#3c2e1c",
+              "primary-fixed-dim": "#e6c190",
+              "inverse-primary": "#e6c190",
+              "surface-container-low": "#fff1e5",
+              "tertiary-fixed-dim": "#cbc6bd",
+              "primary-fixed": "#ffddb2",
+              "on-error-container": "#93000a",
+              "surface-tint": "#755931",
+              "secondary-fixed-dim": "#d5c5a8",
+              "tertiary-fixed": "#e7e2d9",
+              "on-secondary-fixed": "#231a08",
+              "secondary-container": "#efdec0",
+              "on-tertiary-fixed": "#1d1b16",
+              "on-tertiary": "#ffffff",
+              secondary: "#695d46",
+              primary: "#70552d",
+              outline: "#80756a",
+              "on-tertiary-fixed-variant": "#494640",
+              "on-secondary-fixed-variant": "#504530",
+              "secondary-fixed": "#f2e0c3",
+              "surface-container": "#ffebd5",
+            },
+            borderRadius: {
+              DEFAULT: "1rem",
+              lg: "2rem",
+              xl: "3rem",
+              full: "9999px",
+            },
+            spacing: {
+              "gutter-md": "24px",
+              "container-padding": "24px",
+              "gutter-sm": "16px",
+              "card-gap": "20px",
+              unit: "8px",
+              "margin-page": "32px",
+            },
+            fontFamily: {
+              "label-md": ["Courier Prime"],
+              "body-md": ["Work Sans"],
+              "headline-md": ["Bricolage Grotesque"],
+              "button-text": ["Work Sans"],
+              "body-lg": ["Work Sans"],
+              "headline-lg": ["Bricolage Grotesque"],
+              "headline-lg-mobile": ["Bricolage Grotesque"],
+            },
+            fontSize: {
+              "label-md": [
+                "14px",
+                {
+                  lineHeight: "1.4",
+                  letterSpacing: "0.02em",
+                  fontWeight: "400",
+                },
+              ],
+              "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+              "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+              "button-text": ["16px", { lineHeight: "1.2", fontWeight: "600" }],
+              "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+              "headline-lg": ["36px", { lineHeight: "1.2", fontWeight: "700" }],
+              "headline-lg-mobile": [
+                "28px",
+                { lineHeight: "1.2", fontWeight: "700" },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .dough-shadow {
+        box-shadow: 0 4px 12px rgba(139, 109, 67, 0.15);
+      }
+      .crust-border {
+        border: 2px solid #e6c190;
+      }
+      .cookie-btn-active:active {
+        transform: translateY(2px);
+        border-bottom-width: 2px;
+      }
+      select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2370552d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.5em;
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-background font-body-md min-h-screen">
+    <!-- SideNavBar (Desktop) -->
+    <div class="flex-1 flex flex-col">
+      <header
+        class="w-full bg-surface-container-low border-b-2 border-surface-container-highest dough-shadow sticky top-0 z-30"
+      >
+        <div
+          class="max-w-7xl mx-auto px-container-padding h-16 flex items-center justify-between gap-4"
+        >
+          <div class="flex items-center gap-2 shrink-0">
+            <h1
+              class="text-headline-md font-headline-md text-primary leading-tight"
+            >
+              Goukies
+            </h1>
+          </div>
+          <div class="flex-1 flex justify-center max-w-2xl">
+            <div class="relative w-full">
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+                >search</span
+              >
+              <input
+                class="w-full pl-10 pr-4 py-2 rounded-full bg-surface border-2 border-surface-container-highest text-body-md"
+                placeholder="Search recipes, ingredients..."
+                type="text"
+              />
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0"></div>
+        </div>
+        <div
+          class="max-w-7xl mx-auto px-container-padding pb-2 overflow-x-auto no-scrollbar"
+        >
+          <nav class="flex items-center gap-2 py-1">
+            <a
+              class="text-on-surface-variant hover:bg-surface-container-high rounded-full flex items-center gap-2 transition-all duration-200 whitespace-nowrap px-6 py-2.5 text-base"
+              href="#"
+            >
+              <span class="material-symbols-outlined text-[24px]"
+                >dashboard</span
+              >
+              <span class="font-button-text">Dashboard</span>
+            </a>
+            <a
+              class="text-on-surface-variant hover:bg-surface-container-high rounded-full flex items-center gap-2 transition-all duration-200 whitespace-nowrap px-6 py-2.5 text-base"
+              href="#"
+            >
+              <span class="material-symbols-outlined text-[24px]"
+                >menu_book</span
+              >
+              <span class="font-button-text">Recetas</span>
+            </a>
+            <a
+              class="text-on-surface-variant hover:bg-surface-container-high rounded-full flex items-center gap-2 transition-all duration-200 whitespace-nowrap px-6 py-2.5 text-base"
+              href="#"
+            >
+              <span class="material-symbols-outlined text-[24px]"
+                >add_circle</span
+              >
+              <span class="font-button-text">Nueva Receta</span>
+            </a>
+            <a
+              class="bg-secondary-container text-on-secondary-container rounded-full flex items-center gap-2 shadow-sm whitespace-nowrap px-6 py-2.5 text-base"
+              href="#"
+            >
+              <span class="material-symbols-outlined text-[24px] font-bold"
+                >inventory_2</span
+              >
+              <span class="font-button-text font-bold">Inventario</span>
+            </a>
+          </nav>
+        </div>
+      </header>
+      <!-- TopNavBar -->
+      <!-- Main Content Area -->
+      <main
+        class="flex-1 p-gutter-sm md:p-margin-page max-w-4xl mx-auto w-full"
+      >
+        <div class="mb-8">
+          <nav
+            class="flex items-center gap-2 text-on-surface-variant font-label-md mb-4"
+          >
+            <a class="hover:text-primary" href="#">Inventario</a>
+            <span class="material-symbols-outlined text-[16px]"
+              >chevron_right</span
+            >
+            <span class="text-primary font-bold">Agregar Ingrediente</span>
+          </nav>
+          <h2
+            class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary"
+          >
+            Nuevos Sabores
+          </h2>
+          <p class="text-on-surface-variant mt-2 max-w-lg">
+            Añade los suministros frescos para tus próximas creaciones
+            horneadas. Cada ingrediente es una pieza clave de la magia.
+          </p>
+        </div>
+        <!-- Form Card -->
+        <div
+          class="bg-surface-container-low rounded-xl border-2 border-surface-container-highest dough-shadow p-8 md:p-12 relative overflow-hidden"
+        >
+          <!-- Decorative element -->
+          <div
+            class="absolute -top-12 -right-12 w-32 h-32 bg-primary-fixed opacity-10 rounded-full blur-2xl"
+          ></div>
+          <form class="space-y-8 relative z-0">
+            <div class="grid grid-cols-1 gap-gutter-md md:grid-cols-2">
+              <!-- Ingrediente -->
+              <div class="flex flex-col gap-2">
+                <label
+                  class="font-headline-md text-primary text-body-md"
+                  for="ingredient"
+                  >Ingrediente</label
+                >
+                <select
+                  class="bg-surface-bright border-2 border-outline-variant rounded-lg p-4 font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all hover:bg-surface-container w-full"
+                  id="ingredient"
+                >
+                  <option disabled="" selected="">
+                    Selecciona un ingrediente
+                  </option>
+                  <option>Harina de Trigo</option>
+                  <option>Mantequilla sin Sal</option>
+                  <option>Azúcar Mascabado</option>
+                  <option>Chispas de Chocolate</option>
+                  <option>Extracto de Vainilla</option>
+                </select>
+              </div>
+              <!-- Marca -->
+              <div class="flex flex-col gap-2">
+                <label
+                  class="font-headline-md text-primary text-body-md"
+                  for="brand"
+                  >Marca</label
+                >
+                <select
+                  class="bg-surface-bright border-2 border-outline-variant rounded-lg p-4 font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all hover:bg-surface-container w-full"
+                  id="brand"
+                >
+                  <option disabled="" selected="">Selecciona una marca</option>
+                  <option>Lala</option>
+                  <option>Los Pinos</option>
+                  <option>Selecta</option>
+                  <option>Hershey's</option>
+                  <option>McCormick</option>
+                </select>
+              </div>
+              <!-- Cantidad -->
+              <div class="flex flex-col gap-2">
+                <label
+                  class="font-headline-md text-primary text-body-md"
+                  for="category"
+                  >Categora</label
+                >
+                <select
+                  class="bg-surface-bright border-2 border-outline-variant rounded-lg p-4 font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all hover:bg-surface-container w-full"
+                  id="category"
+                >
+                  <option disabled="" selected="">
+                    Selecciona una categora
+                  </option>
+                  <option>Ingredientes Secos</option>
+                  <option>Lcteos</option>
+                  <option>Extras</option>
+                  <option>Saborizantes</option>
+                  <option>Levadura</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-2">
+                <label
+                  class="font-headline-md text-primary text-body-md"
+                  for="quantity"
+                  >Cantidad</label
+                >
+                <div class="relative">
+                  <input
+                    class="bg-surface-bright border-2 border-outline-variant rounded-lg p-4 font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all w-full pr-12"
+                    id="quantity"
+                    placeholder="0"
+                    type="number"
+                  />
+                  <span
+                    class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-primary-container"
+                    >scale</span
+                  >
+                </div>
+              </div>
+              <!-- Unidad -->
+              <div class="flex flex-col gap-2">
+                <label
+                  class="font-headline-md text-primary text-body-md"
+                  for="unit"
+                  >Unidad</label
+                >
+                <select
+                  class="bg-surface-bright border-2 border-outline-variant rounded-lg p-4 font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all hover:bg-surface-container w-full"
+                  id="unit"
+                >
+                  <option>g</option>
+                  <option>kg</option>
+                  <option>ml</option>
+                  <option>l</option>
+                  <option>uds</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-2">
+                <label
+                  class="font-headline-md text-primary text-body-md"
+                  for="pieces"
+                  >Piezas</label
+                >
+                <div class="relative">
+                  <input
+                    class="bg-surface-bright border-2 border-outline-variant rounded-lg p-4 font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all w-full pr-12"
+                    id="pieces"
+                    placeholder="0"
+                    type="number"
+                  />
+                  <span
+                    class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-primary-container"
+                    >numbers</span
+                  >
+                </div>
+              </div>
+              <!-- Categoría -->
+              <div class="flex flex-col gap-2 md:col-span-2"></div>
+            </div>
+            <!-- Actions -->
+            <div
+              class="pt-6 flex flex-col sm:flex-row items-center gap-4 border-t-2 border-surface-container-highest"
+            >
+              <button
+                class="w-full sm:w-auto px-10 py-4 bg-transparent text-primary font-button-text text-button-text rounded-full hover:bg-surface-container-high transition-all active:scale-95"
+                type="button"
+              >
+                Cancelar
+              </button>
+              <button
+                class="w-full sm:w-auto px-10 py-4 bg-primary text-on-primary font-button-text text-button-text rounded-full shadow-lg border-b-4 border-primary-container active:translate-y-1 active:border-b-0 transition-all flex items-center justify-center gap-3 group"
+                type="submit"
+              >
+                <span class="">Guardar Ingrediente</span>
+                <span
+                  class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+                  >arrow_forward</span
+                >
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- Recipe Tip Card -->
+        <div
+          class="mt-8 bg-secondary-container rounded-xl p-6 flex items-start gap-4 crust-border"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-on-secondary-container text-white flex items-center justify-center flex-shrink-0"
+          >
+            <span class="material-symbols-outlined">lightbulb</span>
+          </div>
+          <div>
+            <h4
+              class="font-headline-md text-on-secondary-container text-body-lg"
+            >
+              Consejo del Panadero
+            </h4>
+            <p class="text-on-secondary-container opacity-80 mt-1">
+              Mantener tu inventario al día asegura que nunca te falte ese toque
+              especial a mitad de un horneado. ¡La organización es el primer
+              paso para una galleta perfecta!
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+    <!-- Mobile Navigation Bar -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container border-t-2 border-surface-container-highest flex justify-around items-center px-4 z-50"
+    >
+      <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span class="text-[10px] font-label-md">Inicio</span>
+      </button>
+      <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined">menu_book</span>
+        <span class="text-[10px] font-label-md">Recetas</span>
+      </button>
+      <div class="relative -top-6">
+        <button
+          class="h-14 w-14 rounded-full bg-primary text-white shadow-xl flex items-center justify-center border-4 border-surface"
+        >
+          <span class="material-symbols-outlined text-3xl">add</span>
+        </button>
+      </div>
+      <button class="flex flex-col items-center gap-1 text-primary">
+        <span class="material-symbols-outlined font-bold">inventory_2</span>
+        <span class="text-[10px] font-label-md">Stock</span>
+      </button>
+      <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px] font-label-md">Perfil</span>
+      </button>
+    </nav>
+    <script>
+      // Simple form interaction
+      document.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        // Trigger a sweet animation for submission feedback
+        const button = e.target.querySelector('button[type="submit"]');
+        const originalContent = button.innerHTML;
+        button.innerHTML =
+          '<span class="material-symbols-outlined animate-spin">autorenew</span>';
+        button.disabled = true;
+
+        setTimeout(() => {
+          button.innerHTML =
+            '<span class="material-symbols-outlined">check_circle</span> <span>¡Guardado!</span>';
+          button.classList.replace("bg-primary", "bg-green-600");
+          button.classList.replace(
+            "border-primary-container",
+            "border-green-800",
+          );
+
+          setTimeout(() => {
+            button.innerHTML = originalContent;
+            button.classList.replace("bg-green-600", "bg-primary");
+            button.classList.replace(
+              "border-green-800",
+              "border-primary-container",
+            );
+            button.disabled = false;
+            e.target.reset();
+          }, 2000);
+        }, 1000);
+      });
+
+      // Micro-interaction for dropdowns
+      document.querySelectorAll("select").forEach((select) => {
+        select.addEventListener("focus", () => {
+          select.parentElement
+            .querySelector("label")
+            .classList.add("text-primary");
+        });
+        select.addEventListener("blur", () => {
+          // Keep the color if filled, or revert
+        });
+      });
+    </script>
+  </body>
+</html>

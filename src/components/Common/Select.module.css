@@ -1,0 +1,98 @@
+/* ==========================================
+   SELECT COMPONENT STYLES
+   ========================================== */
+
+.select_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.select_label {
+  font-family: var(--font-label);
+  font-size: var(--font-size-label-md);
+  color: var(--color-on-surface-variant);
+  font-weight: var(--font-weight-regular);
+  display: block;
+  margin-left: 0.5rem;
+}
+
+.select_container {
+  position: relative;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  padding-right: 2.5rem;
+  background-color: var(--color-surface-bright);
+  border: 2px solid var(--color-outline-variant);
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  appearance: none;
+  transition: all var(--transition-normal);
+
+  /* Custom dropdown arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2370552d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.5rem;
+  padding-right: 2.5rem;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(112, 85, 45, 0.1);
+}
+
+.select:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.select:disabled {
+  background-color: var(--color-surface-container-low);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==========================================
+   ERROR STATE
+   ========================================== */
+
+.select_error {
+  border-color: var(--color-error);
+  background-color: rgba(186, 26, 26, 0.05);
+}
+
+.select_error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 4px rgba(186, 26, 26, 0.1);
+}
+
+.select_error_text {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-error);
+  margin-left: 0.5rem;
+}
+
+/* ==========================================
+   OPTION STYLES
+   ========================================== */
+
+.select option {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  padding: 0.5rem;
+}
+
+.select option:checked {
+  background: var(--color-primary);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}

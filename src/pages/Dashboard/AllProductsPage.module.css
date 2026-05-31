@@ -1,0 +1,337 @@
+.all_products_page {
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+.main_content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding-bottom: 120px;
+}
+
+@media (max-width: 768px) {
+  .main_content {
+    padding: 24px 16px;
+    padding-bottom: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main_content {
+    padding: 16px 12px;
+    padding-bottom: 80px;
+  }
+}
+
+/* Page Header */
+.page_header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .page_header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+}
+
+.header_left {
+  flex: 1;
+}
+
+.page_title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .page_title {
+    font-size: 28px;
+  }
+}
+
+.page_subtitle {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Add Ingredient Button */
+.add_ingredient_btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-primary);
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-bottom: 3px solid #5b421c;
+  border-radius: 9999px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.add_ingredient_btn:hover {
+  border-bottom-width: 4px;
+}
+
+.add_ingredient_btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 0px;
+}
+
+.add_ingredient_btn span {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .add_ingredient_btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Filters Container */
+.filters_container {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.filters_container::-webkit-scrollbar {
+  display: none;
+}
+
+.filters_container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.filter_btn {
+  padding: 8px 24px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(139, 109, 67, 0.1);
+}
+
+.filter_btn:hover {
+  box-shadow: 0 4px 12px rgba(139, 109, 67, 0.15);
+}
+
+.filter_btn_active {
+  background-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(139, 109, 67, 0.15);
+}
+
+/* Non-active filter buttons */
+.filters_container .filter_btn:not(.filter_btn_active) {
+  background-color: var(--color-secondary-container);
+  color: var(--color-text-secondary);
+  border: 2px solid var(--color-border);
+  box-shadow: none;
+}
+
+.filters_container .filter_btn:not(.filter_btn_active):hover {
+  background-color: var(--color-surface-container-high);
+}
+
+/* Table Container */
+.table_container {
+  background-color: var(--color-surface-container-low);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(139, 109, 67, 0.15);
+  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table_container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table_container::-webkit-scrollbar-track {
+  background: var(--color-surface-container-low);
+}
+
+.table_container::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+/* Inventory Table */
+.inventory_table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table_head {
+  background-color: var(--color-surface-container-low);
+  border-bottom: 2px solid var(--color-surface-container-high);
+}
+
+.table_header {
+  padding: 16px 24px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+.text_right {
+  text-align: right;
+}
+
+/* Table Body */
+.table_body {
+  border-top: 2px solid var(--color-surface-container-high);
+}
+
+.table_row {
+  border-bottom: 2px solid var(--color-surface-container-high);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.table_row:last-child {
+  border-bottom: none;
+}
+
+.table_row:hover {
+  background-color: var(--color-surface-container);
+}
+
+/* Table Cells */
+.table_cell {
+  padding: 20px 24px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.table_cell_name {
+  padding: 20px 24px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+/* Category Badge */
+.category_badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: var(--color-surface-container-high);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Action Buttons */
+.action_buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.edit_btn,
+.delete_btn {
+  padding: 8px;
+  background-color: transparent;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--color-text-secondary);
+}
+
+.edit_btn:hover {
+  background-color: var(--color-primary-container);
+  color: white;
+}
+
+.delete_btn:hover {
+  background-color: var(--color-error-container);
+  color: var(--color-error);
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+  .page_header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .add_ingredient_btn {
+    width: 100%;
+  }
+
+  .table_header {
+    font-size: 12px;
+    padding: 12px 16px;
+  }
+
+  .table_cell,
+  .table_cell_name {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .inventory_table {
+    min-width: 700px;
+  }
+}

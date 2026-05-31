@@ -1,0 +1,13 @@
+/* ==========================================
+   AUTH FORM COMPONENT STYLES
+   ========================================== */
+
+.auth_form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.auth_form input {
+  width: 100%;
+}

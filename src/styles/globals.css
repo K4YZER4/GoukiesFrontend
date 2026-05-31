@@ -1,0 +1,179 @@
+/* ==========================================
+   RESET & BASE STYLES
+   ========================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  line-height: 1.5;
+  color: var(--color-on-surface);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================
+   TYPOGRAPHY
+   ========================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: var(--font-size-headline-lg);
+}
+
+h2 {
+  font-size: var(--font-size-headline-md);
+}
+
+h3 {
+  font-size: var(--font-size-headline-md);
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-primary-dim);
+}
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
+button {
+  font-family: var(--font-button);
+  font-size: var(--font-size-button-text);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+button:active {
+  transform: translateY(2px);
+}
+
+/* ==========================================
+   INPUTS & FORMS
+   ========================================== */
+
+input, textarea, select {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  border: 2px solid var(--color-outline-variant);
+  border-radius: var(--border-radius-md);
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(112, 85, 45, 0.1);
+}
+
+input::placeholder {
+  color: var(--color-outline-variant);
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+
+/* Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==========================================
+   UTILITIES
+   ========================================== */
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-container-padding);
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==========================================
+   IMAGES
+   ========================================== */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ==========================================
+   MATERIAL SYMBOLS
+   ========================================== */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+  body {
+    font-size: var(--font-size-body-md);
+  }
+
+  h1, h2 {
+    font-size: var(--font-size-headline-lg-mobile);
+  }
+}

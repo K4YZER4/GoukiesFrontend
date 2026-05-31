@@ -1,0 +1,332 @@
+<!doctype html>
+
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Goukies - Registrarse</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&amp;family=Work+Sans:wght@400;600&amp;family=Courier+Prime&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed-dim": "#e6c190",
+              "on-primary-fixed": "#291800",
+              "on-error-container": "#93000a",
+              "on-tertiary": "#ffffff",
+              "surface-container-low": "#fff1e5",
+              "on-error": "#ffffff",
+              "on-surface-variant": "#4e453b",
+              "on-secondary-fixed": "#231a08",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-container": "#76726b",
+              "on-primary-fixed-variant": "#5b421c",
+              "error-container": "#ffdad6",
+              "secondary-fixed-dim": "#d5c5a8",
+              secondary: "#695d46",
+              surface: "#fff8f4",
+              "secondary-fixed": "#f2e0c3",
+              background: "#fff8f4",
+              "surface-container": "#ffebd5",
+              "primary-container": "#8b6d43",
+              outline: "#80756a",
+              "surface-dim": "#eed6bc",
+              "on-secondary-container": "#6d614a",
+              "inverse-surface": "#3c2e1c",
+              error: "#ba1a1a",
+              "on-background": "#251909",
+              "surface-variant": "#f7dfc4",
+              tertiary: "#5d5953",
+              "surface-container-high": "#fde4c9",
+              "surface-container-highest": "#f7dfc4",
+              "on-tertiary-fixed-variant": "#494640",
+              "on-tertiary-fixed": "#1d1b16",
+              "inverse-on-surface": "#ffeedd",
+              "surface-bright": "#fff8f4",
+              "tertiary-fixed-dim": "#cbc6bd",
+              "on-tertiary-container": "#fef8ef",
+              "surface-tint": "#755931",
+              "on-secondary": "#ffffff",
+              "secondary-container": "#efdec0",
+              "inverse-primary": "#e6c190",
+              "on-primary": "#ffffff",
+              "tertiary-fixed": "#e7e2d9",
+              "on-primary-container": "#fff7f1",
+              "primary-fixed": "#ffddb2",
+              "on-secondary-fixed-variant": "#504530",
+              primary: "#70552d",
+              "outline-variant": "#d1c4b7",
+              "on-surface": "#251909",
+            },
+            borderRadius: {
+              DEFAULT: "1rem",
+              lg: "2rem",
+              xl: "3rem",
+              full: "9999px",
+            },
+            spacing: {
+              "gutter-md": "24px",
+              "gutter-sm": "16px",
+              unit: "8px",
+              "container-padding": "24px",
+              "margin-page": "32px",
+              "card-gap": "20px",
+            },
+            fontFamily: {
+              "body-md": ["Work Sans"],
+              "label-md": ["Courier Prime"],
+              "headline-lg": ["Bricolage Grotesque"],
+              "button-text": ["Work Sans"],
+              "headline-md": ["Bricolage Grotesque"],
+              "headline-lg-mobile": ["Bricolage Grotesque"],
+              "body-lg": ["Work Sans"],
+            },
+            fontSize: {
+              "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+              "label-md": [
+                "14px",
+                {
+                  lineHeight: "1.4",
+                  letterSpacing: "0.02em",
+                  fontWeight: "400",
+                },
+              ],
+              "headline-lg": ["36px", { lineHeight: "1.2", fontWeight: "700" }],
+              "button-text": ["16px", { lineHeight: "1.2", fontWeight: "600" }],
+              "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+              "headline-lg-mobile": [
+                "28px",
+                { lineHeight: "1.2", fontWeight: "700" },
+              ],
+              "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .dough-shadow {
+        box-shadow: 0px 8px 24px rgba(139, 109, 67, 0.15);
+      }
+      .chewy-border {
+        border: 2px solid #504530;
+      }
+      .pressed-effect:active {
+        transform: translateY(2px);
+        border-bottom-width: 0px;
+      }
+      .input-focus:focus {
+        outline: none;
+        border-width: 3px;
+        box-shadow: 0 0 0 4px rgba(112, 85, 45, 0.1);
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background min-h-screen flex flex-col font-body-md text-on-background"
+  >
+    <!-- Top Branding Section -->
+    <header class="w-full flex flex-col items-center pt-12 pb-8">
+      <div
+        class="mb-4 transform hover:scale-110 transition-transform duration-300"
+      >
+        <img
+          alt="Goukie Logo"
+          class="w-20 h-20"
+          data-alt="A stylized, chunky chocolate chip cookie illustration with a soft, hand-drawn aesthetic. The cookie is golden-brown with large, melting dark chocolate chunks, set against a clean cream background. The art style is playful and tactile, resembling high-end digital paper-cut art with soft, warm lighting."
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3AXcO2sTuOfT4DgC1XBwxm1u4IaBFvTcXu6G0YuhRm4__wv9cPQjw9_VxzQsK1E1QzWfPVr7vMq05TLbtQajI3cnRdF476FgvTObUAJif4cVuf6guZxdx1zu0ls1UEjCrdiOfU-E74QaAaQbr8UAMI_hTl2K8pwVLsV7jCGaBbB0bY6qpi1R7AtosXHWhhShVZ02x6YZ1PWBSYmnKDds_l7E0WOviNHJsAbL8xF_T9Ky4NLmmxJLAIG1YjyKwYVvHXrda9msE5Wfo"
+        />
+      </div>
+      <h1
+        class="font-headline-lg text-headline-lg text-primary font-black tracking-tight"
+      >
+        Goukies
+      </h1>
+    </header>
+    <!-- Main Registration Card -->
+    <main class="flex-grow flex items-start justify-center px-gutter-sm pb-12">
+      <div
+        class="w-full max-w-md bg-surface-container dough-shadow border-2 border-secondary-container rounded-lg p-8 md:p-10"
+      >
+        <div class="text-center mb-10">
+          <h2 class="font-headline-md text-headline-md text-on-background mb-2">
+            Registrarse
+          </h2>
+          <p class="font-body-md text-body-md text-secondary">
+            Crea tu cuenta para empezar a hornear
+          </p>
+        </div>
+        <form class="space-y-6" onsubmit="event.preventDefault()">
+          <!-- Name Field -->
+          <div class="space-y-2">
+            <label
+              class="font-label-md text-label-md text-on-surface-variant block ml-2"
+              >Nombre Completo</label
+            >
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary"
+                >person</span
+              >
+              <input
+                class="w-full pl-12 pr-4 py-4 bg-surface border-2 border-secondary-container rounded-full text-body-md input-focus transition-all duration-200"
+                placeholder="Tu nombre"
+                type="text"
+              />
+            </div>
+          </div>
+          <!-- Email Field -->
+          <div class="space-y-2">
+            <label
+              class="font-label-md text-label-md text-on-surface-variant block ml-2"
+              >Correo Electrónico</label
+            >
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary"
+                >mail</span
+              >
+              <input
+                class="w-full pl-12 pr-4 py-4 bg-surface border-2 border-secondary-container rounded-full text-body-md input-focus transition-all duration-200"
+                placeholder="ejemplo@correo.com"
+                type="email"
+              />
+            </div>
+          </div>
+          <!-- Password Field -->
+          <div class="space-y-2">
+            <label
+              class="font-label-md text-label-md text-on-surface-variant block ml-2"
+              >Contraseña</label
+            >
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary"
+                >lock</span
+              >
+              <input
+                class="w-full pl-12 pr-4 py-4 bg-surface border-2 border-secondary-container rounded-full text-body-md input-focus transition-all duration-200"
+                placeholder="••••••••"
+                type="password"
+              />
+            </div>
+          </div>
+          <!-- Confirm Password Field -->
+          <div class="space-y-2">
+            <label
+              class="font-label-md text-label-md text-on-surface-variant block ml-2"
+              >Confirmar Contraseña</label
+            >
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary"
+                >verified_user</span
+              >
+              <input
+                class="w-full pl-12 pr-4 py-4 bg-surface border-2 border-secondary-container rounded-full text-body-md input-focus transition-all duration-200"
+                placeholder="••••••••"
+                type="password"
+              />
+            </div>
+          </div>
+          <!-- Register Button -->
+          <button
+            class="w-full flex items-center justify-center gap-3 bg-primary text-on-primary font-button-text text-button-text py-4 rounded-full border-b-4 border-on-primary-fixed-variant hover:brightness-110 active:border-b-0 active:translate-y-1 transition-all duration-100 mt-8"
+            type="submit"
+          >
+            <span>Registrarse</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </form>
+        <!-- Divider -->
+        <div class="flex items-center my-10">
+          <div class="flex-grow h-px bg-secondary-container"></div>
+          <span class="px-4 font-label-md text-secondary"
+            >o si ya tienes cuenta</span
+          >
+          <div class="flex-grow h-px bg-secondary-container"></div>
+        </div>
+        <!-- Login Link Button -->
+        <button
+          class="w-full bg-surface-container-high text-primary font-button-text text-button-text py-4 rounded-full border-2 border-primary-fixed hover:bg-surface-container-highest transition-colors duration-200"
+        >
+          Iniciar Sesión
+        </button>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer
+      class="w-full max-w-md mx-auto px-gutter-sm pb-12 space-y-6 text-center"
+    >
+      <div class="flex justify-center gap-6">
+        <a
+          class="font-label-md text-secondary hover:text-primary transition-colors"
+          href="#"
+          >Ayuda</a
+        >
+        <a
+          class="font-label-md text-secondary hover:text-primary transition-colors"
+          href="#"
+          >Términos</a
+        >
+        <a
+          class="font-label-md text-secondary hover:text-primary transition-colors"
+          href="#"
+          >Privacidad</a
+        >
+      </div>
+      <p class="font-label-md text-on-secondary-fixed-variant opacity-60">
+        © 2024 Goukies Recipe Manager. Horneado con amor.
+      </p>
+    </footer>
+    <script>
+      // Simple micro-interaction for button press effect
+      document.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("mousedown", () => {
+          button.classList.add("scale-95");
+        });
+        button.addEventListener("mouseup", () => {
+          button.classList.remove("scale-95");
+        });
+        button.addEventListener("mouseleave", () => {
+          button.classList.remove("scale-95");
+        });
+      });
+
+      // Sticky input label focus effect
+      document.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("focus", () => {
+          input.parentElement.previousElementSibling.classList.add(
+            "text-primary",
+            "font-bold",
+          );
+        });
+        input.addEventListener("blur", () => {
+          input.parentElement.previousElementSibling.classList.remove(
+            "text-primary",
+            "font-bold",
+          );
+        });
+      });
+    </script>
+  </body>
+</html>
