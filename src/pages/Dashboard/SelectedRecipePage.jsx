@@ -1,197 +1,213 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Header, Navigation, MobileBottomNav } from '../../components/Layout';
+import { LoadingSpinner } from '../../components/Common';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import recipeService from '../../services/recipeService';
+import { recipeStorage } from '../../utils/localStorage';
 import styles from './SelectedRecipePage.module.css';
-import { Header, Navigation } from '../../components/Layout';
 
 /**
  * SelectedRecipePage Component
- * Displays detailed view of a single recipe with ingredients and instructions
+ * Displays detailed view of a single recipe
+ * Allows editing and deletion of recipes
  */
 const SelectedRecipePage = () => {
-  const [activeTab, setActiveTab] = useState('recetas');
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
 
-  // Mock recipe data
-  const recipe = {
-    id: 1,
-    title: 'Pépitas de Chocolate Clásicas',
-    badge: 'TOP RATED',
-    description:
-      '"The golden perfection with crispy edges and a gooey center that melts in your mouth. A foolproof recipe for any occasion."',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAu-bjNfQlyd258G5vwXf2AP6_Q3LbWJfjCjZ3QoLhRRvxMjjvAnhKEES5td0scq9i6bw8BpWB4_p8jUIqlnb7fD1BfrFu9eSM0YuuhmMDt15ijCdxfXrIPRgw90JdDS0d-_ohTXJOGj_v_aBGvCK7_dj7ld3mFgdgzn_evb5TqyrzbFqvnzqvuGXBwMQt91OThZ2PC9WdF_xUyeBpn7dVzDX_ouG2aqvzOaaEq0pS9DsuqtSEwqtd4HzXoYt2b84G57XrXZHkKRzeG',
-    prepTime: 15,
-    cookTime: 20,
-    servings: 24,
-    rating: 4.8,
-    reviews: 24,
-    ingredients: [
-      { name: '250g Harina de Trigo', quantity: '250', unit: 'g' },
-      { name: '150g Chispas de Chocolate', quantity: '150', unit: 'g' },
-      { name: '100g Mantequilla (Softened)', quantity: '100', unit: 'g' },
-      { name: '1 Huevo Grande', quantity: '1', unit: 'piezas' },
-      { name: '100g Brown Sugar', quantity: '100', unit: 'g' },
-      { name: '5g Vanilla Extract', quantity: '5', unit: 'g' },
-    ],
-    instructions: [
-      {
-        step: 1,
-        description:
-          'Preheat your oven to 180°C (350°F). Line two large baking sheets with parchment paper to ensure no sticking and even browning of the cookie bottoms.',
-      },
-      {
-        step: 2,
-        description:
-          'In a large bowl, beat the softened butter, brown sugar, and granulated sugar together until the mixture is light, fluffy, and perfectly creamy. This creates the "chewy" base we love.',
-      },
-      {
-        step: 3,
-        description:
-          'Gradually fold in the flour and a pinch of salt. Once just combined, pour in the star of the show: the chocolate chips. Mix gently to ensure chocolate in every bite!',
-      },
-      {
-        step: 4,
-        description:
-          'Scoop rounded tablespoons of dough onto your sheets. Bake for 10-12 minutes until edges are golden but the center remains soft. Let them cool slightly—if you can wait!',
-      },
-    ],
+  const [recipe, setRecipe] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeMobileTab, setActiveMobileTab] = useState('recipes');
+
+  // Load recipe on mount
+  useEffect(() => {
+    const loadRecipe = async () => {
+      try {
+        setIsLoading(true);
+
+        // Try to get from cache first
+        const cachedRecipes = recipeStorage.getAll();
+        const cachedRecipe = cachedRecipes?.find(r => r.id === id);
+        
+        if (cachedRecipe) {
+          setRecipe(cachedRecipe);
+        }
+
+        // Fetch fresh data from API
+        if (user?.id && id) {
+          const data = await recipeService.getRecipeById(id, user.id);
+          if (data) {
+            setRecipe(data);
+            showToast('Receta cargada', 'success');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading recipe:', error);
+        showToast('Error al cargar la receta', 'error');
+        
+        if (!recipe) {
+          navigate('/recetas');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadRecipe();
+  }, [id, user?.id, showToast, navigate, recipe]);
+
+  const handleDelete = async () => {
+    if (confirm('¿Estás seguro de que deseas eliminar esta receta?')) {
+      try {
+        await recipeService.deleteRecipe(id);
+        showToast('Receta eliminada', 'success');
+        navigate('/recetas');
+      } catch (error) {
+        showToast('Error al eliminar la receta', 'error');
+      }
+    }
   };
 
-  const [checkedIngredients, setCheckedIngredients] = useState({});
-
-  const toggleIngredient = (index) => {
-    setCheckedIngredients((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+  const handleEdit = () => {
+    // Navigate to edit page (not yet implemented)
+    navigate(`/recetas/${id}/editar`);
   };
+
+  const handleBack = () => {
+    navigate('/recetas');
+  };
+
+  // Show loading spinner
+  if (isLoading || !recipe) {
+    return (
+      <div className={styles.selected_recipe_page}>
+        <Header />
+        <Navigation />
+        <div className={styles.recipe_loading}>
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.selected_recipe_page}>
       {/* Header */}
-      <Header profileInitials="JD" />
+      <Header />
 
       {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation />
 
       {/* Main Content */}
-      <main className={styles.main_content}>
-        {/* Hero Section */}
-        <section className={styles.hero_section}>
-          <div className={styles.hero_image_container}>
-            <div className={styles.hero_glow}></div>
-            <img src={recipe.image} alt={recipe.title} className={styles.hero_image} />
-          </div>
+      <main className={styles.recipe_main}>
+        <div className={styles.recipe_container}>
+          {/* Back Button */}
+          <button className={styles.recipe_back_btn} onClick={handleBack}>
+            <span className="material-symbols-outlined">arrow_back</span>
+            Volver a Recetas
+          </button>
 
-          <div className={styles.hero_content}>
-            <div className={styles.recipe_badge}>{recipe.badge}</div>
-            <h1 className={styles.recipe_title}>{recipe.title}</h1>
-
-            <div className={styles.recipe_description_box}>
-              <p className={styles.recipe_description}>{recipe.description}</p>
+          {/* Recipe Header */}
+          <section className={styles.recipe_header}>
+            <div className={styles.recipe_image_container}>
+              {recipe.image && (
+                <img
+                  src={recipe.image}
+                  alt={recipe.title}
+                  className={styles.recipe_image}
+                />
+              )}
             </div>
-          </div>
-        </section>
 
-        {/* Recipe Meta Info */}
-        <section className={styles.recipe_meta}>
-          <div className={styles.meta_item}>
-            <span className="material-symbols-outlined">schedule</span>
-            <div className={styles.meta_content}>
-              <p className={styles.meta_label}>PREP TIME</p>
-              <p className={styles.meta_value}>{recipe.prepTime} min</p>
-            </div>
-          </div>
+            <div className={styles.recipe_info}>
+              <h1 className={styles.recipe_title}>{recipe.title}</h1>
+              <p className={styles.recipe_description}>{recipe.descripcion}</p>
 
-          <div className={styles.meta_item}>
-            <span className="material-symbols-outlined">local_fire_department</span>
-            <div className={styles.meta_content}>
-              <p className={styles.meta_label}>COOK TIME</p>
-              <p className={styles.meta_value}>{recipe.cookTime} min</p>
-            </div>
-          </div>
-
-          <div className={styles.meta_item}>
-            <span className="material-symbols-outlined">group</span>
-            <div className={styles.meta_content}>
-              <p className={styles.meta_label}>SERVINGS</p>
-              <p className={styles.meta_value}>{recipe.servings}</p>
-            </div>
-          </div>
-
-          <div className={styles.meta_item}>
-            <span className="material-symbols-outlined">star</span>
-            <div className={styles.meta_content}>
-              <p className={styles.meta_label}>RATING</p>
-              <p className={styles.meta_value}>
-                {recipe.rating}★ ({recipe.reviews})
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Content Grid */}
-        <div className={styles.content_grid}>
-          {/* Ingredients Sidebar */}
-          <aside className={styles.ingredients_sidebar}>
-            <div className={styles.ingredients_card}>
-              <div className={styles.ingredients_header}>
-                <span className="material-symbols-outlined">shopping_basket</span>
-                <h2 className={styles.section_title}>Ingredients</h2>
+              <div className={styles.recipe_meta}>
+                {recipe.tiempo && (
+                  <div className={styles.meta_item}>
+                    <span className="material-symbols-outlined">schedule</span>
+                    <span>{recipe.tiempo} min</span>
+                  </div>
+                )}
+                {recipe.dificultad && (
+                  <div className={styles.meta_item}>
+                    <span className="material-symbols-outlined">difficulty</span>
+                    <span>{recipe.dificultad}</span>
+                  </div>
+                )}
+                {recipe.rating && (
+                  <div className={styles.meta_item}>
+                    <span className="material-symbols-outlined">star</span>
+                    <span>{recipe.rating}/5</span>
+                  </div>
+                )}
               </div>
 
-              <ul className={styles.ingredients_list}>
-                {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index} className={styles.ingredient_item}>
-                    <label className={styles.ingredient_checkbox_label}>
-                      <input
-                        type="checkbox"
-                        className={styles.ingredient_checkbox}
-                        checked={checkedIngredients[index] || false}
-                        onChange={() => toggleIngredient(index)}
-                      />
-                      <div className={styles.checkbox_visual}>
-                        {checkedIngredients[index] && (
-                          <span className="material-symbols-outlined">check</span>
-                        )}
-                      </div>
-                      <span
-                        className={`${styles.ingredient_name} ${
-                          checkedIngredients[index] ? styles.ingredient_checked : ''
-                        }`}
-                      >
-                        {ingredient.name}
-                      </span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
+              <div className={styles.recipe_actions}>
+                <button 
+                  className={styles.recipe_btn_edit}
+                  onClick={handleEdit}
+                >
+                  <span className="material-symbols-outlined">edit</span>
+                  Editar
+                </button>
+                <button 
+                  className={styles.recipe_btn_delete}
+                  onClick={handleDelete}
+                >
+                  <span className="material-symbols-outlined">delete</span>
+                  Eliminar
+                </button>
+              </div>
             </div>
-          </aside>
+          </section>
 
-          {/* Instructions Section */}
-          <section className={styles.instructions_section}>
-            <div className={styles.instructions_header}>
-              <span className="material-symbols-outlined">restaurant</span>
-              <h2 className={styles.section_title}>Preparation Steps</h2>
-            </div>
+          {/* Recipe Content */}
+          <section className={styles.recipe_content}>
+            {recipe.ingredientes && (
+              <div className={styles.recipe_section}>
+                <h2 className={styles.recipe_section_title}>Ingredientes</h2>
+                <ul className={styles.recipe_ingredients_list}>
+                  {recipe.ingredientes.map((ingredient, idx) => (
+                    <li key={idx} className={styles.ingredient_item}>
+                      {ingredient}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-            <div className={styles.instructions_list}>
-              {recipe.instructions.map((instruction) => (
-                <div key={instruction.step} className={styles.instruction_item}>
-                  <div className={styles.instruction_badge}>{instruction.step}</div>
-                  <div className={styles.instruction_content}>
-                    <p className={styles.instruction_text}>{instruction.description}</p>
-                    {instruction.step === recipe.instructions.length && (
-                      <div className={styles.progress_bar}>
-                        <div className={styles.progress_fill}></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            {recipe.instrucciones && (
+              <div className={styles.recipe_section}>
+                <h2 className={styles.recipe_section_title}>Instrucciones</h2>
+                <ol className={styles.recipe_instructions_list}>
+                  {recipe.instrucciones.map((instruction, idx) => (
+                    <li key={idx} className={styles.instruction_item}>
+                      {instruction}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {recipe.notas && (
+              <div className={styles.recipe_section}>
+                <h2 className={styles.recipe_section_title}>Notas</h2>
+                <p className={styles.recipe_notes}>{recipe.notas}</p>
+              </div>
+            )}
           </section>
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav activeTab={activeMobileTab} onTabChange={setActiveMobileTab} />
     </div>
   );
 };

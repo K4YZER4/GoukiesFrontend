@@ -1,132 +1,183 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './AllRecipesPage.module.css';
 import { Header, Navigation, MobileBottomNav } from '../../components/Layout';
 import { RecipeCard } from '../../components/Cards';
-import { Button, Badge } from '../../components';
-import { mockAllRecipes } from '../Dashboard/mockRecipes';
+import { LoadingSpinner } from '../../components/Common';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import recipeService from '../../services/recipeService';
+import { recipeStorage } from '../../utils/localStorage';
 
 /**
  * AllRecipesPage Component
- * Displays all recipes in a grid layout with filtering and view options
+ * Displays a list of all recipes for the authenticated user
+ * Supports filtering and search functionality
  */
 const AllRecipesPage = () => {
-  const [activeTab, setActiveTab] = useState('recipes');
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
+
+  const [recipes, setRecipes] = useState([]);
+  const [filteredRecipes, setFilteredRecipes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [activeMobileTab, setActiveMobileTab] = useState('recipes');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
-  const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const categories = ['all', 'chocolate', 'frutas', 'saludables', 'sin-gluten'];
+  // Load recipes on mount
+  useEffect(() => {
+    const loadRecipes = async () => {
+      try {
+        setIsLoading(true);
 
-  const filteredRecipes =
-    selectedCategory === 'all'
-      ? mockAllRecipes
-      : mockAllRecipes.filter((recipe) =>
-          recipe.id % 2 === 0 ? selectedCategory === 'chocolate' : selectedCategory !== 'chocolate'
-        );
+        // Check cached data first
+        const cachedRecipes = recipeStorage.getAll();
+        if (cachedRecipes && cachedRecipes.length > 0) {
+          setRecipes(cachedRecipes);
+          setFilteredRecipes(cachedRecipes);
+        }
+
+        // Fetch fresh data from API
+        if (user?.id) {
+          const data = await recipeService.getAllRecipes(user.id);
+          
+          if (data && Array.isArray(data)) {
+            setRecipes(data);
+            setFilteredRecipes(data);
+            recipeStorage.setAll(data); // Cache the recipes
+            showToast('Recetas actualizado', 'success');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading recipes:', error);
+        showToast('Error al cargar las recetas', 'error');
+        
+        // Use cached data if available
+        const cachedRecipes = recipeStorage.getAll();
+        if (cachedRecipes && cachedRecipes.length > 0) {
+          setRecipes(cachedRecipes);
+          setFilteredRecipes(cachedRecipes);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadRecipes();
+  }, [user?.id, showToast]);
+
+  // Handle search/filter
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredRecipes(recipes);
+    } else {
+      const term = searchTerm.toLowerCase();
+      const filtered = recipes.filter(
+        recipe =>
+          recipe.title?.toLowerCase().includes(term) ||
+          recipe.descripcion?.toLowerCase().includes(term)
+      );
+      setFilteredRecipes(filtered);
+    }
+  }, [searchTerm, recipes]);
+
+  const handleCreateRecipe = () => {
+    navigate('/nueva-receta');
+  };
+
+  const handleRecipeClick = (id) => {
+    navigate(`/recetas/${id}`);
+  };
+
+  // Show loading spinner
+  if (isLoading && recipes.length === 0) {
+    return (
+      <div className={styles.all_recipes_page}>
+        <Header />
+        <Navigation />
+        <div className={styles.recipes_loading}>
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.all_recipes_page}>
       {/* Header */}
-      <Header profileInitials="JD" />
+      <Header onSearch={setSearchTerm} />
 
       {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation />
 
       {/* Main Content */}
-      <main className={styles.all_recipes_main}>
-        <div className={styles.all_recipes_container}>
-          {/* Page Header */}
-          <section className={styles.all_recipes_header}>
-            <div className={styles.all_recipes_title_section}>
-              <h2 className={styles.all_recipes_title}>Mis Recetas</h2>
-              <p className={styles.all_recipes_subtitle}>
-                {filteredRecipes.length} deliciosas recetas de galletas
+      <main className={styles.recipes_main}>
+        <div className={styles.recipes_container}>
+          {/* Header Section */}
+          <section className={styles.recipes_header}>
+            <div className={styles.recipes_header_content}>
+              <h1 className={styles.recipes_title}>Todas mis Recetas</h1>
+              <p className={styles.recipes_subtitle}>
+                Tienes {recipes.length} receta{recipes.length !== 1 ? 's' : ''} guardada{recipes.length !== 1 ? 's' : ''}
               </p>
             </div>
-
-            {/* View Controls */}
-            <div className={styles.all_recipes_controls}>
-              {/* View Mode Toggle */}
-              <div className={styles.view_mode_toggle}>
-                <button
-                  className={`${styles.view_mode_btn} ${
-                    viewMode === 'grid' ? styles.view_mode_btn_active : ''
-                  }`}
-                  onClick={() => setViewMode('grid')}
-                  title="Vista de diseño"
-                >
-                  <span className="material-symbols-outlined">grid_view</span>
-                  <span className={styles.view_mode_label}>Vista Diseño</span>
-                </button>
-                <button
-                  className={`${styles.view_mode_btn} ${
-                    viewMode === 'list' ? styles.view_mode_btn_active : ''
-                  }`}
-                  onClick={() => setViewMode('list')}
-                  title="Vista de edición"
-                >
-                  <span className="material-symbols-outlined">list</span>
-                  <span className={styles.view_mode_label}>Edición</span>
-                </button>
-              </div>
-
-              {/* New Recipe Button */}
-              <Button variant="primary" size="md">
-                <span className="material-symbols-outlined">add</span>
-                Nueva Receta
-              </Button>
-            </div>
+            <button 
+              className={styles.recipes_create_btn}
+              onClick={handleCreateRecipe}
+            >
+              <span className="material-symbols-outlined">add_circle</span>
+              Nueva Receta
+            </button>
           </section>
 
           {/* Recipes Grid */}
-          <section className={styles.all_recipes_content}>
-            {/* Filter Badges */}
-            <div className={styles.all_recipes_filters}>
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  className={`${styles.filter_badge} ${
-                    selectedCategory === category ? styles.filter_badge_active : ''
-                  }`}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category === 'all'
-                    ? 'Todas'
-                    : category === 'chocolate'
-                    ? 'Chocolate'
-                    : category === 'frutas'
-                    ? 'Frutas'
-                    : category === 'saludables'
-                    ? 'Saludables'
-                    : 'Sin Gluten'}
-                </button>
-              ))}
-            </div>
-
-            {/* Recipes Grid */}
-            <div className={styles.all_recipes_grid}>
-              {filteredRecipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe.id}
-                  id={recipe.id}
-                  image={recipe.image}
-                  title={recipe.title}
-                  description={recipe.description}
-                  rating={recipe.rating}
-                />
-              ))}
-
-              {/* New Recipe Card - Placeholder */}
-              <div className={styles.new_recipe_card}>
-                <div className={styles.new_recipe_icon_container}>
-                  <span className="material-symbols-outlined">add_circle</span>
-                </div>
-                <h3 className={styles.new_recipe_title}>¿Tienes una nueva idea?</h3>
-                <p className={styles.new_recipe_description}>
-                  Haz clic aquí para empezar a escribir tu próxima obra maestra horneada.
-                </p>
+          <section className={styles.recipes_section}>
+            {filteredRecipes.length > 0 ? (
+              <div className={styles.recipes_grid}>
+                {filteredRecipes.map((recipe) => (
+                  <div
+                    key={recipe.id}
+                    onClick={() => handleRecipeClick(recipe.id)}
+                    className={styles.recipe_card_wrapper}
+                  >
+                    <RecipeCard
+                      id={recipe.id}
+                      image={recipe.image}
+                      title={recipe.title}
+                      description={recipe.descripcion}
+                      rating={recipe.rating}
+                      difficulty={recipe.dificultad}
+                      time={recipe.tiempo}
+                    />
+                  </div>
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className={styles.recipes_empty}>
+                <div className={styles.recipes_empty_icon}>
+                  <span className="material-symbols-outlined">
+                    menu_book
+                  </span>
+                </div>
+                <h3 className={styles.recipes_empty_title}>
+                  {searchTerm ? 'No se encontraron recetas' : 'No hay recetas aún'}
+                </h3>
+                <p className={styles.recipes_empty_subtitle}>
+                  {searchTerm
+                    ? 'Intenta con otros términos de búsqueda'
+                    : 'Crea una nueva receta para comenzar'}
+                </p>
+                {!searchTerm && (
+                  <button 
+                    className={styles.recipes_empty_btn}
+                    onClick={handleCreateRecipe}
+                  >
+                    + Crear Primera Receta
+                  </button>
+                )}
+              </div>
+            )}
           </section>
         </div>
       </main>

@@ -1,175 +1,277 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './AllProductsPage.module.css';
-import { Header, Navigation } from '../../components/Layout';
+import { Header, Navigation, MobileBottomNav } from '../../components/Layout';
+import { LoadingSpinner } from '../../components/Common';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import ingredientService from '../../services/ingredientService';
+import { ingredientStorage } from '../../utils/localStorage';
 
 /**
  * AllProductsPage Component
- * Displays all inventory/products in a table format
+ * Displays inventory/ingredients list for the authenticated user
+ * Supports filtering, search, and CRUD operations
  */
 const AllProductsPage = () => {
-  const [activeTab, setActiveTab] = useState('inventario');
-  const [selectedCategory, setSelectedCategory] = useState('todo');
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
 
-  // Mock products data
-  const allProducts = [
-    {
-      id: 1,
-      name: 'Harina de Trigo',
-      category: 'dry',
-      categoryLabel: 'Ingredientes Secos',
-      quantity: 2500,
-      quantityInv: 2000,
-      unit: 'g',
-    },
-    {
-      id: 2,
-      name: 'Azúcar Granulada',
-      category: 'dry',
-      categoryLabel: 'Ingredientes Secos',
-      quantity: 1800,
-      quantityInv: 1500,
-      unit: 'g',
-    },
-    {
-      id: 3,
-      name: 'Mantequilla',
-      category: 'dairy',
-      categoryLabel: 'Lácteos',
-      quantity: 800,
-      quantityInv: 500,
-      unit: 'g',
-    },
-    {
-      id: 4,
-      name: 'Chispas de Chocolate',
-      category: 'extras',
-      categoryLabel: 'Extras',
-      quantity: 150,
-      quantityInv: 100,
-      unit: 'g',
-    },
-    {
-      id: 5,
-      name: 'Extracto de Vainilla',
-      category: 'flavoring',
-      categoryLabel: 'Saborizantes',
-      quantity: 100,
-      quantityInv: 80,
-      unit: 'ml',
-    },
-    {
-      id: 6,
-      name: 'Huevos',
-      category: 'dairy',
-      categoryLabel: 'Lácteos',
-      quantity: 12,
-      quantityInv: 6,
-      unit: 'uds',
-    },
-  ];
+  const [ingredients, setIngredients] = useState([]);
+  const [filteredIngredients, setFilteredIngredients] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState(''); // For filtering by type
+  const [activeMobileTab, setActiveMobileTab] = useState('inventory');
+  const [ingredientTypes, setIngredientTypes] = useState([]);
 
-  const categories = [
-    { id: 'todo', label: 'Todo' },
-    { id: 'dry', label: 'Ingredientes Secos' },
-    { id: 'dairy', label: 'Lácteos' },
-    { id: 'extras', label: 'Extras' },
-    { id: 'flavoring', label: 'Saborizantes' },
-    { id: 'yeast', label: 'Levadura' },
-  ];
+  // Load ingredients on mount
+  useEffect(() => {
+    const loadIngredients = async () => {
+      try {
+        setIsLoading(true);
 
-  const filteredProducts =
-    selectedCategory === 'todo'
-      ? allProducts
-      : allProducts.filter((product) => product.category === selectedCategory);
+        // Check cached data first
+        const cachedIngredients = ingredientStorage.getAll();
+        if (cachedIngredients && cachedIngredients.length > 0) {
+          setIngredients(cachedIngredients);
+          setFilteredIngredients(cachedIngredients);
+          // Extract unique types
+          const types = [...new Set(cachedIngredients.map(ing => ing.tipo))];
+          setIngredientTypes(types);
+        }
+
+        // Fetch fresh data from API
+        if (user?.id) {
+          const data = await ingredientService.getAllIngredients(user.id);
+          
+          if (data) {
+            // The API returns an object with arrays, but we want a flat list
+            const ingredientsList = data.ingredientes || [];
+            setIngredients(ingredientsList);
+            setFilteredIngredients(ingredientsList);
+            ingredientStorage.setAll(ingredientsList); // Cache the ingredients
+            
+            // Extract unique types for filter
+            const types = [...new Set(ingredientsList.map(ing => ing.tipo))];
+            setIngredientTypes(types);
+            
+            showToast('Inventario actualizado', 'success');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading ingredients:', error);
+        showToast('Error al cargar el inventario', 'error');
+        
+        // Use cached data if available
+        const cachedIngredients = ingredientStorage.getAll();
+        if (cachedIngredients && cachedIngredients.length > 0) {
+          setIngredients(cachedIngredients);
+          setFilteredIngredients(cachedIngredients);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadIngredients();
+  }, [user?.id, showToast]);
+
+  // Handle search/filter
+  useEffect(() => {
+    let filtered = ingredients;
+
+    // Apply search term filter
+    if (searchTerm.trim() !== '') {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        ingredient =>
+          ingredient.nombre?.toLowerCase().includes(term) ||
+          ingredient.marca?.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply type filter
+    if (filterType !== '') {
+      filtered = filtered.filter(ingredient => ingredient.tipo === filterType);
+    }
+
+    setFilteredIngredients(filtered);
+  }, [searchTerm, filterType, ingredients]);
+
+  const handleCreateIngredient = () => {
+    navigate('/nuevo-ingrediente');
+  };
+
+  const handleDeleteIngredient = async (id) => {
+    if (confirm('¿Estás seguro de que deseas eliminar este ingrediente?')) {
+      try {
+        await ingredientService.deleteIngredient(id);
+        const updated = ingredients.filter(ing => ing.id !== id);
+        setIngredients(updated);
+        ingredientStorage.setAll(updated);
+        showToast('Ingrediente eliminado', 'success');
+      } catch (error) {
+        showToast('Error al eliminar el ingrediente', 'error');
+      }
+    }
+  };
+
+  const handleEditIngredient = (id) => {
+    // Navigate to edit page (not yet implemented)
+    navigate(`/inventario/${id}/editar`);
+  };
+
+  // Show loading spinner
+  if (isLoading && ingredients.length === 0) {
+    return (
+      <div className={styles.all_products_page}>
+        <Header />
+        <Navigation />
+        <div className={styles.products_loading}>
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.all_products_page}>
       {/* Header */}
-      <Header profileInitials="JD" />
+      <Header onSearch={setSearchTerm} />
 
       {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation />
 
       {/* Main Content */}
-      <main className={styles.main_content}>
-        {/* Page Header */}
-        <div className={styles.page_header}>
-          <div className={styles.header_left}>
-            <h2 className={styles.page_title}>Inventario de Ingredientes</h2>
-            <p className={styles.page_subtitle}>
-              {filteredProducts.length} ingredientes en stock para tus horneados
-            </p>
-          </div>
-          <button className={styles.add_ingredient_btn}>
-            <span className="material-symbols-outlined">add</span>
-            Agregar Ingrediente
-          </button>
-        </div>
-
-        {/* Category Filters */}
-        <div className={styles.filters_container}>
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              className={`${styles.filter_btn} ${
-                selectedCategory === category.id ? styles.filter_btn_active : ''
-              }`}
-              onClick={() => setSelectedCategory(category.id)}
+      <main className={styles.products_main}>
+        <div className={styles.products_container}>
+          {/* Header Section */}
+          <section className={styles.products_header}>
+            <div className={styles.products_header_content}>
+              <h1 className={styles.products_title}>Mi Inventario</h1>
+              <p className={styles.products_subtitle}>
+                Tienes {ingredients.length} ingrediente{ingredients.length !== 1 ? 's' : ''} en tu inventario
+              </p>
+            </div>
+            <button 
+              className={styles.products_create_btn}
+              onClick={handleCreateIngredient}
             >
-              {category.label}
+              <span className="material-symbols-outlined">add_circle</span>
+              Nuevo Ingrediente
             </button>
-          ))}
-        </div>
+          </section>
 
-        {/* Inventory Table */}
-        <div className={styles.table_container}>
-          <table className={styles.inventory_table}>
-            <thead className={styles.table_head}>
-              <tr>
-                <th className={styles.table_header}>Ingrediente</th>
-                <th className={styles.table_header}>MARCA</th>
-                <th className={`${styles.table_header} ${styles.text_right}`}>
-                  Cantidad
-                </th>
-                <th className={`${styles.table_header} ${styles.text_right}`}>
-                  CANTIDAD INV.
-                </th>
-                <th className={styles.table_header}>Unidad</th>
-                <th className={`${styles.table_header} ${styles.text_right}`}>
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className={styles.table_body}>
-              {filteredProducts.map((product) => (
-                <tr key={product.id} className={styles.table_row}>
-                  <td className={styles.table_cell_name}>{product.name}</td>
-                  <td className={styles.table_cell}>
-                    <span className={styles.category_badge}>{product.categoryLabel}</span>
-                  </td>
-                  <td className={`${styles.table_cell} ${styles.text_right}`}>
-                    {product.quantity}
-                  </td>
-                  <td className={`${styles.table_cell} ${styles.text_right}`}>
-                    {product.quantityInv}
-                  </td>
-                  <td className={styles.table_cell}>{product.unit}</td>
-                  <td className={`${styles.table_cell} ${styles.text_right}`}>
-                    <div className={styles.action_buttons}>
-                      <button className={styles.edit_btn} title="Editar">
-                        <span className="material-symbols-outlined">edit</span>
-                      </button>
-                      <button className={styles.delete_btn} title="Eliminar">
-                        <span className="material-symbols-outlined">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Filter Section */}
+          {ingredientTypes.length > 0 && (
+            <section className={styles.products_filters}>
+              <label className={styles.filter_label}>Filtrar por tipo:</label>
+              <select 
+                className={styles.filter_select}
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+              >
+                <option value="">Todos los tipos</option>
+                {ingredientTypes.map(type => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </section>
+          )}
+
+          {/* Products Table */}
+          <section className={styles.products_section}>
+            {filteredIngredients.length > 0 ? (
+              <div className={styles.products_table_wrapper}>
+                <table className={styles.products_table}>
+                  <thead>
+                    <tr>
+                      <th>Ingrediente</th>
+                      <th>Marca</th>
+                      <th>Tipo</th>
+                      <th>Cantidad</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredIngredients.map((ingredient) => (
+                      <tr key={ingredient.id}>
+                        <td className={styles.ingredient_name}>
+                          {ingredient.nombre}
+                        </td>
+                        <td>
+                          <span className={styles.ingredient_badge}>
+                            {ingredient.marca || 'N/A'}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={styles.ingredient_type}>
+                            {ingredient.tipo}
+                          </span>
+                        </td>
+                        <td className={styles.ingredient_quantity}>
+                          {ingredient.cantidad} {ingredient.unidad}
+                        </td>
+                        <td className={styles.ingredient_actions}>
+                          <button
+                            className={styles.action_btn_edit}
+                            onClick={() => handleEditIngredient(ingredient.id)}
+                            title="Editar"
+                          >
+                            <span className="material-symbols-outlined">
+                              edit
+                            </span>
+                          </button>
+                          <button
+                            className={styles.action_btn_delete}
+                            onClick={() => handleDeleteIngredient(ingredient.id)}
+                            title="Eliminar"
+                          >
+                            <span className="material-symbols-outlined">
+                              delete
+                            </span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className={styles.products_empty}>
+                <div className={styles.products_empty_icon}>
+                  <span className="material-symbols-outlined">
+                    inventory_2
+                  </span>
+                </div>
+                <h3 className={styles.products_empty_title}>
+                  {searchTerm || filterType ? 'No se encontraron ingredientes' : 'Tu inventario está vacío'}
+                </h3>
+                <p className={styles.products_empty_subtitle}>
+                  {searchTerm || filterType
+                    ? 'Intenta con otros términos de búsqueda o filtros'
+                    : 'Añade un ingrediente para comenzar'}
+                </p>
+                {!searchTerm && !filterType && (
+                  <button 
+                    className={styles.products_empty_btn}
+                    onClick={handleCreateIngredient}
+                  >
+                    + Añadir Primer Ingrediente
+                  </button>
+                )}
+              </div>
+            )}
+          </section>
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav activeTab={activeMobileTab} onTabChange={setActiveMobileTab} />
     </div>
   );
 };

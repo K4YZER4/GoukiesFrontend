@@ -73,6 +73,8 @@ export const authStorage = {
 export const recipeStorage = {
   setRecipes: (recipes) => setLocalStorage(KEYS.RECIPES, recipes),
   getRecipes: () => getLocalStorage(KEYS.RECIPES),
+  setAll: (recipes) => setLocalStorage(KEYS.RECIPES, recipes), // Alias for compatibility
+  getAll: () => getLocalStorage(KEYS.RECIPES), // Alias for compatibility
   setSelectedRecipe: (recipe) => setLocalStorage(KEYS.SELECTED_RECIPE, recipe),
   getSelectedRecipe: () => getLocalStorage(KEYS.SELECTED_RECIPE),
   clearRecipes: () => removeLocalStorage(KEYS.RECIPES),
@@ -81,14 +83,18 @@ export const recipeStorage = {
 export const ingredientStorage = {
   setIngredients: (ingredients) => setLocalStorage(KEYS.INGREDIENTS, ingredients),
   getIngredients: () => getLocalStorage(KEYS.INGREDIENTS),
+  setAll: (ingredients) => setLocalStorage(KEYS.INGREDIENTS, ingredients), // Alias for compatibility
+  getAll: () => getLocalStorage(KEYS.INGREDIENTS), // Alias for compatibility
   setIngredientsMetadata: (metadata) => setLocalStorage(KEYS.INGREDIENTS_META, metadata),
   getIngredientsMetadata: () => getLocalStorage(KEYS.INGREDIENTS_META),
   clearIngredients: () => removeLocalStorage(KEYS.INGREDIENTS),
 };
 
 export const dashboardStorage = {
-  setDashboard: (data) => setLocalStorage(KEYS.DASHBOARD, data),
-  getDashboard: () => getLocalStorage(KEYS.DASHBOARD),
+  set: (data) => setLocalStorage(KEYS.DASHBOARD, data),
+  get: () => getLocalStorage(KEYS.DASHBOARD),
+  setDashboard: (data) => setLocalStorage(KEYS.DASHBOARD, data), // Backward compatibility
+  getDashboard: () => getLocalStorage(KEYS.DASHBOARD), // Backward compatibility
   clearDashboard: () => removeLocalStorage(KEYS.DASHBOARD),
 };
 
