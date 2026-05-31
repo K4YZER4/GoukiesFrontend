@@ -43,6 +43,7 @@
   font-weight: var(--font-weight-regular);
   color: var(--color-on-surface-variant);
   background-color: transparent;
+  border: none;
   border-radius: var(--border-radius-full);
   text-decoration: none;
   white-space: nowrap;
@@ -61,6 +62,39 @@
   color: var(--color-on-primary);
   font-weight: var(--font-weight-bold);
   box-shadow: var(--shadow-dough);
+}
+
+/* ==========================================
+   LOGOUT BUTTON
+   ========================================== */
+
+.navigation__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  font-family: var(--font-button);
+  font-size: var(--font-size-button-text);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-on-surface-variant);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--border-radius-full);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  flex-shrink: 0;
+  margin-left: auto; /* Push to the right */
+}
+
+.navigation__logout:hover {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.navigation__logout:active {
+  background-color: #ffcdd2;
 }
 
 /* ==========================================
@@ -97,6 +131,11 @@
     font-size: 0.875rem;
   }
 
+  .navigation__logout {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
   .navigation__icon {
     font-size: 1.25rem;
   }
@@ -107,6 +146,10 @@
 
   .navigation__link--active .navigation__label {
     display: inline;
+  }
+
+  .navigation__logout .navigation__label {
+    display: none;
   }
 }
 

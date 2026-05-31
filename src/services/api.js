@@ -12,7 +12,8 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // para enviar cookies si las usamos después
+  // ✅ REMOVIDO: withCredentials: true (causaba CORS error)
+  // Se usará después cuando implementemos JWT en headers
 });
 
 /**

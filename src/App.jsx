@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext';
+import { AuthProvider } from './context/AuthContext.jsx';
+import { ToastProvider } from './context/ToastContext.jsx';
 import { ToastContainer, ProtectedRoute } from './components/Common';
 
 // Import pages

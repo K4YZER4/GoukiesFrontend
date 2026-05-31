@@ -399,3 +399,29 @@
     overflow-x: scroll;
   }
 }
+
+/* ==========================================
+   LOADING STATE
+   ========================================== */
+
+.dashboard_loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 50vh;
+}
+
+/* ==========================================
+   EMPTY MESSAGES
+   ========================================== */
+
+.empty_message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  margin: 0;
+}
