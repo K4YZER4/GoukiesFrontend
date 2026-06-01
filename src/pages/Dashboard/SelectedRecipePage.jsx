@@ -35,15 +35,14 @@ const SelectedRecipePage = () => {
         const cachedRecipe = cachedRecipes?.find(r => r.id === id);
         
         if (cachedRecipe) {
-          setRecipe(cachedRecipe);
+          setRecipe(normalizeRecipe(cachedRecipe));
         }
 
         // Fetch fresh data from API
         if (user?.id && id) {
           const data = await recipeService.getRecipeById(id, user.id);
           if (data) {
-            setRecipe(data);
-            showToast('Receta cargada', 'success');
+            setRecipe(normalizeRecipe(data));
           }
         }
       } catch (error) {
@@ -59,7 +58,36 @@ const SelectedRecipePage = () => {
     };
 
     loadRecipe();
-  }, [id, user?.id, showToast, navigate, recipe]);
+  }, [id, user?.id]);
+
+  // Normalize recipe data from API format to component format
+  const normalizeRecipe = (data) => {
+    if (!data) return null;
+    return {
+      id: data.id,
+      nombre: data.nombre || data.title || 'Sin nombre',
+      title: data.nombre || data.title || 'Sin nombre',
+      descripcion: data.descripcion || '',
+      image: data.imagenURL || data.image || null,
+      imagenURL: data.imagenURL || data.image || null,
+      profit: data.profit || 0,
+      porcionesTotales: data.porcionesTotales || data.porciones || 0,
+      ingredientes: Array.isArray(data.ingredientes) 
+        ? data.ingredientes.map(ing => {
+            if (typeof ing === 'string') return ing;
+            const nombre = ing.producto?.ingrediente || ing.nombre || 'Ingrediente';
+            const cantidad = ing.cantidad || '';
+            const unidad = ing.producto?.unidad || ing.unidad || '';
+            return `${cantidad} ${unidad} de ${nombre}`.trim();
+          })
+        : [],
+      pasos: Array.isArray(data.pasos) ? data.pasos : [],
+      instrucciones: Array.isArray(data.pasos) 
+        ? data.pasos.map(p => p.paso || p.descripcion || '')
+        : (Array.isArray(data.instrucciones) ? data.instrucciones : []),
+      notas: data.notas || '',
+    };
+  };
 
   const handleDelete = async () => {
     if (confirm('¿Estás seguro de que deseas eliminar esta receta?')) {
@@ -118,33 +146,27 @@ const SelectedRecipePage = () => {
               {recipe.image && (
                 <img
                   src={recipe.image}
-                  alt={recipe.title}
+                  alt={recipe.title || recipe.nombre}
                   className={styles.recipe_image}
                 />
               )}
             </div>
 
             <div className={styles.recipe_info}>
-              <h1 className={styles.recipe_title}>{recipe.title}</h1>
+              <h1 className={styles.recipe_title}>{recipe.title || recipe.nombre}</h1>
               <p className={styles.recipe_description}>{recipe.descripcion}</p>
 
               <div className={styles.recipe_meta}>
-                {recipe.tiempo && (
+                {recipe.porcionesTotales && (
                   <div className={styles.meta_item}>
-                    <span className="material-symbols-outlined">schedule</span>
-                    <span>{recipe.tiempo} min</span>
+                    <span className="material-symbols-outlined">restaurant</span>
+                    <span>{recipe.porcionesTotales} porciones</span>
                   </div>
                 )}
-                {recipe.dificultad && (
+                {recipe.profit && (
                   <div className={styles.meta_item}>
-                    <span className="material-symbols-outlined">difficulty</span>
-                    <span>{recipe.dificultad}</span>
-                  </div>
-                )}
-                {recipe.rating && (
-                  <div className={styles.meta_item}>
-                    <span className="material-symbols-outlined">star</span>
-                    <span>{recipe.rating}/5</span>
+                    <span className="material-symbols-outlined">trending_up</span>
+                    <span>Profit: {recipe.profit}</span>
                   </div>
                 )}
               </div>
