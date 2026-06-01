@@ -1,51 +1,48 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './CreateProductPage.module.css';
 import { Header, Navigation } from '../../components/Layout';
-import { Button, Input, Select } from '../../components/Common';
+import { Input, Select } from '../../components';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import ingredientService from '../../services/ingredientService';
+import { ingredientStorage } from '../../utils/localStorage';
 
 /**
  * CreateProductPage Component
  * Form to add new products/ingredients to inventory
  */
 const CreateProductPage = () => {
-  const [activeTab, setActiveTab] = useState('inventario');
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
+
   const [formData, setFormData] = useState({
-    ingredient: '',
-    brand: '',
-    category: '',
-    quantity: '',
-    unit: 'g',
-    pieces: '',
+    nombre: '',
+    marca: '',
+    tipo: '',
+    cantidad: '',
+    unidad: 'gramos',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
 
-  const ingredients = [
-    'Harina de Trigo',
-    'Mantequilla sin Sal',
-    'Azúcar Mascabado',
-    'Chispas de Chocolate',
-    'Extracto de Vainilla',
-  ];
-
-  const brands = [
-    'Lala',
-    'Los Pinos',
-    'Selecta',
-    'Hershey\'s',
-    'McCormick',
-  ];
-
-  const categories = [
+  const tipos = [
     'Ingredientes Secos',
-    'Lácteos',
+    'LÃ¡cteos',
     'Extras',
     'Saborizantes',
     'Levadura',
+    'Otros',
   ];
 
-  const units = ['g', 'kg', 'ml', 'l', 'uds'];
+  const unidades = [
+    { value: 'gramos', label: 'Gramos (g)' },
+    { value: 'kilogramos', label: 'Kilogramos (kg)' },
+    { value: 'mililitros', label: 'Mililitros (ml)' },
+    { value: 'litros', label: 'Litros (l)' },
+    { value: 'unidades', label: 'Unidades (ud)' },
+  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -55,56 +52,111 @@ const CreateProductPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus('saving');
 
-    // Simulate API call
-    setTimeout(() => {
-      setSubmitStatus('success');
-      setFormData({
-        ingredient: '',
-        brand: '',
-        category: '',
-        quantity: '',
-        unit: 'g',
-        pieces: '',
-      });
+    // Validate required fields
+    if (!formData.nombre.trim()) {
+      showToast('El nombre del ingrediente es requerido', 'error');
+      return;
+    }
 
-      // Reset status after 2 seconds
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setSubmitStatus(null);
-      }, 2000);
-    }, 1000);
+    if (!formData.tipo) {
+      showToast('Selecciona un tipo de ingrediente', 'error');
+      return;
+    }
+
+    if (!formData.cantidad || isNaN(formData.cantidad)) {
+      showToast('La cantidad debe ser un nÃºmero vÃ¡lido', 'error');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // Prepare data for API
+      const ingredientData = {
+        id_usuario: user.id,
+        nombre: formData.nombre,
+        marca: formData.marca || null,
+        tipo: formData.tipo,
+        cantidad: parseFloat(formData.cantidad),
+        unidad: formData.unidad,
+      };
+
+      // Call API to create ingredient
+      const response = await ingredientService.createIngredient(ingredientData);
+
+      if (response) {
+        showToast('Â¡Ingrediente aÃ±adido exitosamente!', 'success');
+        
+        // Update local cache
+        const cachedIngredients = ingredientStorage.getAll() || [];
+        ingredientStorage.setAll([...cachedIngredients, response]);
+
+        // Reset form and redirect
+        setFormData({
+          nombre: '',
+          marca: '',
+          tipo: '',
+          cantidad: '',
+          unidad: 'gramos',
+        });
+
+        // Redirect to inventory page
+        setTimeout(() => {
+          navigate('/inventario');
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Error creating ingredient:', error);
+      const errorMessage = error.response?.data?.message || 'Error al aÃ±adir el ingrediente';
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    if (formData.nombre || formData.marca || formData.tipo || formData.cantidad) {
+      if (confirm('Â¿Descartar cambios?')) {
+        navigate('/inventario');
+      }
+    } else {
+      navigate('/inventario');
+    }
   };
 
   return (
     <div className={styles.create_product_page}>
       {/* Header */}
-      <Header profileInitials="JD" />
+      <Header />
 
       {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation />
 
       {/* Main Content */}
       <main className={styles.main_content}>
         {/* Breadcrumb */}
         <div className={styles.breadcrumb}>
-          <a href="#" className={styles.breadcrumb_link}>Inventario</a>
+          <button 
+            className={styles.breadcrumb_link}
+            onClick={() => navigate('/inventario')}
+          >
+            Inventario
+          </button>
           <span className={styles.breadcrumb_separator}>
             <span className="material-symbols-outlined">chevron_right</span>
           </span>
-          <span className={styles.breadcrumb_current}>Agregar Ingrediente</span>
+          <span className={styles.breadcrumb_current}>AÃ±adir Ingrediente</span>
         </div>
 
         {/* Page Header */}
         <div className={styles.page_header}>
           <h2 className={styles.page_title}>Nuevos Sabores</h2>
           <p className={styles.page_subtitle}>
-            Añade los suministros frescos para tus próximas creaciones
-            horneadas. Cada ingrediente es una pieza clave de la magia.
+            AÃ±ade los suministros frescos para tus prÃ³ximas creaciones horneadas. 
+            Cada ingrediente es una pieza clave de la magia.
           </p>
         </div>
 
@@ -115,69 +167,67 @@ const CreateProductPage = () => {
 
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.form_grid}>
-              {/* Ingredient */}
+              {/* Ingredient Name */}
               <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="ingredient">
-                  Ingrediente
+                <label className={styles.form_label} htmlFor="nombre">
+                  Nombre del Ingrediente
                 </label>
-                <Select
-                  id="ingredient"
-                  name="ingredient"
-                  value={formData.ingredient}
+                <Input
+                  id="nombre"
+                  name="nombre"
+                  placeholder="p. ej., Harina de Trigo"
+                  value={formData.nombre}
                   onChange={handleInputChange}
-                  options={[
-                    { value: '', label: 'Selecciona un ingrediente' },
-                    ...ingredients.map(ing => ({ value: ing, label: ing })),
-                  ]}
+                  fullWidth
                 />
               </div>
 
               {/* Brand */}
               <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="brand">
-                  Marca
+                <label className={styles.form_label} htmlFor="marca">
+                  Marca (Opcional)
                 </label>
-                <Select
-                  id="brand"
-                  name="brand"
-                  value={formData.brand}
+                <Input
+                  id="marca"
+                  name="marca"
+                  placeholder="p. ej., La Copetera"
+                  value={formData.marca}
                   onChange={handleInputChange}
-                  options={[
-                    { value: '', label: 'Selecciona una marca' },
-                    ...brands.map(brand => ({ value: brand, label: brand })),
-                  ]}
+                  fullWidth
                 />
               </div>
 
-              {/* Category */}
+              {/* Type */}
               <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="category">
-                  Categoría
+                <label className={styles.form_label} htmlFor="tipo">
+                  Tipo de Ingrediente
                 </label>
                 <Select
-                  id="category"
-                  name="category"
-                  value={formData.category}
+                  id="tipo"
+                  name="tipo"
+                  value={formData.tipo}
                   onChange={handleInputChange}
                   options={[
-                    { value: '', label: 'Selecciona una categoría' },
-                    ...categories.map(cat => ({ value: cat, label: cat })),
+                    { value: '', label: 'Selecciona un tipo' },
+                    ...tipos.map(tipo => ({ value: tipo, label: tipo })),
                   ]}
+                  fullWidth
                 />
               </div>
 
               {/* Quantity */}
               <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="quantity">
+                <label className={styles.form_label} htmlFor="cantidad">
                   Cantidad
                 </label>
                 <div className={styles.input_with_icon}>
                   <Input
-                    id="quantity"
-                    name="quantity"
+                    id="cantidad"
+                    name="cantidad"
                     type="number"
+                    step="0.1"
                     placeholder="0"
-                    value={formData.quantity}
+                    value={formData.cantidad}
                     onChange={handleInputChange}
                   />
                   <span className={`${styles.input_icon} material-symbols-outlined`}>
@@ -188,89 +238,48 @@ const CreateProductPage = () => {
 
               {/* Unit */}
               <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="unit">
-                  Unidad
+                <label className={styles.form_label} htmlFor="unidad">
+                  Unidad de Medida
                 </label>
                 <Select
-                  id="unit"
-                  name="unit"
-                  value={formData.unit}
+                  id="unidad"
+                  name="unidad"
+                  value={formData.unidad}
                   onChange={handleInputChange}
-                  options={units.map(u => ({ value: u, label: u }))}
+                  options={unidades}
                 />
-              </div>
-
-              {/* Pieces */}
-              <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="pieces">
-                  Piezas
-                </label>
-                <div className={styles.input_with_icon}>
-                  <Input
-                    id="pieces"
-                    name="pieces"
-                    type="number"
-                    placeholder="0"
-                    value={formData.pieces}
-                    onChange={handleInputChange}
-                  />
-                  <span className={`${styles.input_icon} material-symbols-outlined`}>
-                    numbers
-                  </span>
-                </div>
               </div>
             </div>
 
             {/* Actions */}
             <div className={styles.form_actions}>
-              <Button
+              <button
                 type="button"
-                variant="secondary"
                 className={styles.cancel_btn}
+                onClick={handleCancel}
+                disabled={isSubmitting}
               >
                 Cancelar
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
-                variant="primary"
                 className={styles.submit_btn}
                 disabled={isSubmitting}
               >
-                {isSubmitting && submitStatus === 'saving' ? (
+                {isSubmitting ? (
                   <>
-                    <span className={`material-symbols-outlined ${styles.spin}`}>
-                      autorenew
-                    </span>
-                  </>
-                ) : submitStatus === 'success' ? (
-                  <>
-                    <span className="material-symbols-outlined">check_circle</span>
-                    <span>¡Guardado!</span>
+                    <span className="material-symbols-outlined">hourglass_empty</span>
+                    Guardando...
                   </>
                 ) : (
                   <>
-                    <span>Guardar Ingrediente</span>
-                    <span className="material-symbols-outlined">arrow_forward</span>
+                    <span className="material-symbols-outlined">check</span>
+                    Guardar Ingrediente
                   </>
                 )}
-              </Button>
+              </button>
             </div>
           </form>
-        </div>
-
-        {/* Baker's Tip Card */}
-        <div className={styles.tip_card}>
-          <div className={styles.tip_icon}>
-            <span className="material-symbols-outlined">lightbulb</span>
-          </div>
-          <div className={styles.tip_content}>
-            <h4 className={styles.tip_title}>Consejo del Panadero</h4>
-            <p className={styles.tip_text}>
-              Mantener tu inventario al día asegura que nunca te falte ese toque
-              especial a mitad de un horneado. ¡La organización es el primer
-              paso para una galleta perfecta!
-            </p>
-          </div>
         </div>
       </main>
     </div>
