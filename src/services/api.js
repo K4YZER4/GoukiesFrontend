@@ -1,19 +1,18 @@
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * API Client - Cliente HTTP centralizado para todas las requests
  * Configura base URL, headers por defecto, y manejo de errores
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-  // ✅ REMOVIDO: withCredentials: true (causaba CORS error)
-  // Se usará después cuando implementemos JWT en headers
 });
 
 /**
@@ -23,7 +22,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Log para debug
-    console.error('API Error:', {
+    console.error("API Error:", {
       status: error.response?.status,
       message: error.response?.data?.message,
       data: error.response?.data,
@@ -31,7 +30,7 @@ api.interceptors.response.use(
 
     // Devolvemos el error original para que lo maneje el componente
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
