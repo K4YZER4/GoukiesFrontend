@@ -40,25 +40,23 @@ const CreateRecipePage = () => {
     instrucciones: [{ paso: 1, descripcion: "" }],
   });
 
-  // Load inventory data on mount
+  // Load inventory data on mount (producto = user's inventory items)
   useEffect(() => {
     const loadInventory = async () => {
       try {
         setIsLoadingInventory(true);
         if (user?.id) {
           const data = await ingredientService.getAllIngredients(user.id);
-          if (data && data.ingredientes) {
-            setInventoryData(data.ingredientes);
+          if (data && data.producto) {
+            setInventoryData(data.producto);
           }
         }
       } catch (error) {
         console.error('Error loading inventory:', error);
-        // Try to load from cache
         const cached = ingredientStorage.getIngredientsMetadata();
-        if (cached?.ingredientes) {
-          setInventoryData(cached.ingredientes);
+        if (cached?.producto) {
+          setInventoryData(cached.producto);
         }
-        // Don't show toast for inventory load errors - not critical
       } finally {
         setIsLoadingInventory(false);
       }
@@ -85,9 +83,9 @@ const CreateRecipePage = () => {
     setFormData((prev) => {
       const newIngredientes = [...prev.ingredientes];
       newIngredientes[index] = {
-        nombre: ingredient.nombre,
+        nombre: ingredient.name || ingredient.ingrediente || '',
         cantidad: "",
-        unidad: ingredient.unidad,
+        unidad: ingredient.unit || ingredient.unidad || 'gramos',
         id: ingredient.id,
       };
       return { ...prev, ingredientes: newIngredientes };
@@ -219,6 +217,7 @@ const CreateRecipePage = () => {
           .filter(ing => ing.nombre && ing.id)
           .map(ing => ({
             id_producto: ing.id,
+            cantidad: parseFloat(ing.cantidad) || 0,
           })),
         pasos: formData.instrucciones
           .filter(inst => inst.descripcion)
