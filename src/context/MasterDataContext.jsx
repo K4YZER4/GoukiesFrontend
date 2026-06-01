@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 import masterDataService from '../services/masterDataService';
 import { masterDataStorage } from '../utils/localStorage';
 
@@ -10,6 +11,7 @@ import { masterDataStorage } from '../utils/localStorage';
 export const MasterDataContext = createContext();
 
 export const MasterDataProvider = ({ children }) => {
+  const { user } = useContext(AuthContext) || {};
   const [masterData, setMasterData] = useState({
     marca: [],
     tipo: [],
@@ -22,6 +24,8 @@ export const MasterDataProvider = ({ children }) => {
 
   // Cargar datos maestros
   const loadMasterData = useCallback(async () => {
+    if (!user?.id) return;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -34,9 +38,9 @@ export const MasterDataProvider = ({ children }) => {
         return;
       }
 
-      // Cargar desde API
+      // Cargar desde API - pasa el id_usuario (requerido por el endpoint)
       console.log('📡 Fetching master data from API...');
-      const data = await masterDataService.getAllMasterData();
+      const data = await masterDataService.getAllMasterData(user.id);
       
       if (data) {
         console.log('✓ Master data fetched:', {
@@ -61,7 +65,7 @@ export const MasterDataProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user?.id]);
 
   // Cargar datos al montar el componente
   useEffect(() => {
