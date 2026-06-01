@@ -210,13 +210,14 @@ const CreateRecipePage = () => {
     try {
       setIsSubmitting(true);
 
-      // Prepare data for API - formato correcto según la API de NestJS
+      // Prepare data for API - formato correcto según el DTO de NestJS
       const recipeData = {
         nombre: formData.title,
         descripcion: formData.descripcion,
         profit: parseInt(formData.porciones) || 0,
         porcionesTotales: parseInt(formData.porciones) || 0,
         idUsuario: user.id,
+        ...(formData.imagenUrl && { imagenURL: formData.imagenUrl }),
         ingredientes: formData.ingredientes
           .filter(ing => ing.nombre && ing.id)
           .map(ing => {
