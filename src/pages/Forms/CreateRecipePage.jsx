@@ -35,7 +35,6 @@ const CreateRecipePage = () => {
   const [formData, setFormData] = useState({
     title: "",
     descripcion: "",
-    dificultad: "facil",
     porciones: "",
     tiempo: "",
     imagen: null,
@@ -85,7 +84,6 @@ const CreateRecipePage = () => {
           setFormData({
             title: data.nombre || '',
             descripcion: data.descripcion || '',
-            dificultad: 'facil',
             porciones: String(data.porciones_totales || data.profit || ''),
             tiempo: '',
             imagen: null,
@@ -420,20 +418,6 @@ const CreateRecipePage = () => {
                       type="number"
                       value={formData.tiempo}
                       onChange={handleInputChange}
-                      fullWidth
-                    />
-                  </div>
-                  <div className={styles.form_group}>
-                    <label className={styles.form_label}>Dificultad</label>
-                    <Select
-                      name="dificultad"
-                      value={formData.dificultad}
-                      onChange={handleInputChange}
-                      options={[
-                        { value: "facil", label: "Fácil" },
-                        { value: "medio", label: "Medio" },
-                        { value: "dificil", label: "Difícil" },
-                      ]}
                       fullWidth
                     />
                   </div>

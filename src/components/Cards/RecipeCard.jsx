@@ -14,10 +14,6 @@ const RecipeCard = ({
   image,
   title,
   description,
-  rating = 4.9,
-  difficulty = 'Fácil',
-  time = '15 min',
-  category = '',
   onClick = null,
 }) => {
   const showImage = isValidImage(image);
@@ -33,14 +29,6 @@ const RecipeCard = ({
             <span>Imagen no proporcionada</span>
           </div>
         )}
-        {rating && (
-          <div className={styles.recipe_card_rating}>
-            <span className="material-symbols-outlined recipe-icon-star">
-              star
-            </span>
-            <span className={styles.recipe_card_rating_text}>{rating}</span>
-          </div>
-        )}
       </div>
 
       {/* Content */}
@@ -50,24 +38,6 @@ const RecipeCard = ({
           <p className={styles.recipe_card_description}>{description}</p>
         )}
       </div>
-
-      {/* Meta Info */}
-      {(time || difficulty) && (
-        <div className={styles.recipe_card_footer}>
-          {time && (
-            <div className={styles.recipe_card_meta}>
-              <span className="material-symbols-outlined">timer</span>
-              <span>{time}</span>
-            </div>
-          )}
-          {difficulty && (
-            <div className={styles.recipe_card_meta}>
-              <span className="material-symbols-outlined">equalizer</span>
-              <span>{difficulty}</span>
-            </div>
-          )}
-        </div>
-      )}
     </article>
   );
 };
