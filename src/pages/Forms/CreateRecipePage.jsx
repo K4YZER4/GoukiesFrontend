@@ -1,86 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./CreateRecipePage.module.css";
 import { Header, Navigation } from "../../components/Layout";
+import { LoadingSpinner } from "../../components/Common";
 import { Input, Select, IngredientModal } from "../../components";
+import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../hooks/useToast";
+import recipeService from "../../services/recipeService";
+import ingredientService from "../../services/ingredientService";
+import { recipeStorage } from "../../utils/localStorage";
 
 /**
  * CreateRecipePage Component
  * Form for creating a new recipe with ingredients and instructions
  */
 const CreateRecipePage = () => {
-  const [activeTab, setActiveTab] = useState("nueva-receta");
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalIngredientIndex, setModalIngredientIndex] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inventoryData, setInventoryData] = useState([]);
+  const [isLoadingInventory, setIsLoadingInventory] = useState(true);
   
   const [formData, setFormData] = useState({
     title: "",
-    description: "",
-    difficulty: "facil",
-    servings: "",
-    prepTime: "",
-    cookTime: "",
-    image: null,
-    ingredients: [{ name: "", quantity: "", unit: "gramos", id: null }],
-    instructions: [{ step: 1, description: "" }],
+    descripcion: "",
+    dificultad: "facil",
+    porciones: "",
+    tiempo: "",
+    imagen: null,
+    ingredientes: [{ nombre: "", cantidad: "", unidad: "gramos", id: null }],
+    instrucciones: [{ paso: 1, descripcion: "" }],
   });
 
-  // Mock inventory data
-  const mockInventory = [
-    {
-      id: 1,
-      name: "Harina de Trigo",
-      category: "dry",
-      categoryLabel: "Ingredientes Secos",
-      quantity: 2500,
-      quantityInv: 2000,
-      unit: "g",
-    },
-    {
-      id: 2,
-      name: "Azúcar Granulada",
-      category: "dry",
-      categoryLabel: "Ingredientes Secos",
-      quantity: 1800,
-      quantityInv: 1500,
-      unit: "g",
-    },
-    {
-      id: 3,
-      name: "Mantequilla",
-      category: "dairy",
-      categoryLabel: "Lácteos",
-      quantity: 800,
-      quantityInv: 500,
-      unit: "g",
-    },
-    {
-      id: 4,
-      name: "Chispas de Chocolate",
-      category: "extras",
-      categoryLabel: "Extras",
-      quantity: 150,
-      quantityInv: 100,
-      unit: "g",
-    },
-    {
-      id: 5,
-      name: "Extracto de Vainilla",
-      category: "flavoring",
-      categoryLabel: "Saborizantes",
-      quantity: 100,
-      quantityInv: 80,
-      unit: "ml",
-    },
-    {
-      id: 6,
-      name: "Huevos",
-      category: "dairy",
-      categoryLabel: "Lácteos",
-      quantity: 12,
-      quantityInv: 6,
-      unit: "uds",
-    },
-  ];
+  // Load inventory data on mount
+  useEffect(() => {
+    const loadInventory = async () => {
+      try {
+        setIsLoadingInventory(true);
+        if (user?.id) {
+          const data = await ingredientService.getAllIngredients(user.id);
+          if (data && data.ingredientes) {
+            setInventoryData(data.ingredientes);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading inventory:', error);
+        showToast('Error al cargar el inventario', 'error');
+      } finally {
+        setIsLoadingInventory(false);
+      }
+    };
+
+    loadInventory();
+  }, [user?.id, showToast]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -98,14 +74,14 @@ const CreateRecipePage = () => {
   const handleSelectIngredient = (ingredient) => {
     const index = modalIngredientIndex;
     setFormData((prev) => {
-      const newIngredients = [...prev.ingredients];
-      newIngredients[index] = {
-        name: ingredient.name,
-        quantity: "",
-        unit: ingredient.unit,
+      const newIngredientes = [...prev.ingredientes];
+      newIngredientes[index] = {
+        nombre: ingredient.nombre,
+        cantidad: "",
+        unidad: ingredient.unidad,
         id: ingredient.id,
       };
-      return { ...prev, ingredients: newIngredients };
+      return { ...prev, ingredientes: newIngredientes };
     });
     setIsModalOpen(false);
     setModalIngredientIndex(null);
@@ -114,31 +90,31 @@ const CreateRecipePage = () => {
   const handleAddIngredientRow = () => {
     setFormData((prev) => ({
       ...prev,
-      ingredients: [...prev.ingredients, { name: "", quantity: "", unit: "gramos", id: null }],
+      ingredientes: [...prev.ingredientes, { nombre: "", cantidad: "", unidad: "gramos", id: null }],
     }));
   };
 
   const handleRemoveIngredient = (index) => {
     setFormData((prev) => ({
       ...prev,
-      ingredients: prev.ingredients.filter((_, i) => i !== index),
+      ingredientes: prev.ingredientes.filter((_, i) => i !== index),
     }));
   };
 
   const handleIngredientChange = (index, field, value) => {
     setFormData((prev) => {
-      const newIngredients = [...prev.ingredients];
-      newIngredients[index][field] = value;
-      return { ...prev, ingredients: newIngredients };
+      const newIngredientes = [...prev.ingredientes];
+      newIngredientes[index][field] = value;
+      return { ...prev, ingredientes: newIngredientes };
     });
   };
 
   const handleAddInstruction = () => {
     setFormData((prev) => ({
       ...prev,
-      instructions: [
-        ...prev.instructions,
-        { step: prev.instructions.length + 1, description: "" },
+      instrucciones: [
+        ...prev.instrucciones,
+        { paso: prev.instrucciones.length + 1, descripcion: "" },
       ],
     }));
   };
@@ -146,32 +122,108 @@ const CreateRecipePage = () => {
   const handleRemoveInstruction = (index) => {
     setFormData((prev) => ({
       ...prev,
-      instructions: prev.instructions
+      instrucciones: prev.instrucciones
         .filter((_, i) => i !== index)
-        .map((instruction, i) => ({ ...instruction, step: i + 1 })),
+        .map((instruction, i) => ({ ...instruction, paso: i + 1 })),
     }));
   };
 
   const handleInstructionChange = (index, value) => {
     setFormData((prev) => {
-      const newInstructions = [...prev.instructions];
-      newInstructions[index].description = value;
-      return { ...prev, instructions: newInstructions };
+      const newInstrucciones = [...prev.instrucciones];
+      newInstrucciones[index].descripcion = value;
+      return { ...prev, instrucciones: newInstrucciones };
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+
+    // Validate required fields
+    if (!formData.title.trim()) {
+      showToast('El nombre de la receta es requerido', 'error');
+      return;
+    }
+
+    if (formData.ingredientes.every(ing => !ing.nombre)) {
+      showToast('AÃ±ade al menos un ingrediente', 'error');
+      return;
+    }
+
+    if (formData.instrucciones.every(inst => !inst.descripcion)) {
+      showToast('AÃ±ade al menos una instrucciÃ³n', 'error');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // Prepare data for API
+      const recipeData = {
+        id_usuario: user.id,
+        title: formData.title,
+        descripcion: formData.descripcion,
+        dificultad: formData.dificultad,
+        porciones: parseInt(formData.porciones) || 0,
+        tiempo: parseInt(formData.tiempo) || 0,
+        ingredientes: formData.ingredientes
+          .filter(ing => ing.nombre)
+          .map(ing => `${ing.cantidad} ${ing.unidad} de ${ing.nombre}`)
+          .join(', '),
+        instrucciones: formData.instrucciones
+          .filter(inst => inst.descripcion)
+          .map(inst => inst.descripcion)
+          .join('\n'),
+        imagen: formData.imagen || null,
+      };
+
+      // Call API to create recipe
+      const response = await recipeService.createRecipe(recipeData);
+
+      if (response) {
+        showToast('Â¡Receta creada exitosamente!', 'success');
+        
+        // Update local cache
+        const cachedRecipes = recipeStorage.getAll() || [];
+        recipeStorage.setAll([...cachedRecipes, response]);
+
+        // Redirect to recipes page
+        navigate('/recetas');
+      }
+    } catch (error) {
+      console.error('Error creating recipe:', error);
+      const errorMessage = error.response?.data?.message || 'Error al crear la receta';
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const handleCancel = () => {
+    if (confirm('Â¿Descartar cambios?')) {
+      navigate('/recetas');
+    }
+  };
+
+  if (isLoadingInventory) {
+    return (
+      <div className={styles.create_recipe_page}>
+        <Header />
+        <Navigation />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: '50vh' }}>
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.create_recipe_page}>
       {/* Header */}
-      <Header profileInitials="JD" />
+      <Header />
 
       {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation />
 
       {/* Main Content */}
       <main className={styles.main_content}>
@@ -179,7 +231,7 @@ const CreateRecipePage = () => {
         <div className={styles.page_header}>
           <h2 className={styles.page_title}>Crear Nueva Receta</h2>
           <p className={styles.page_subtitle}>
-            Rellena los detalles para tu nueva creación.
+            Rellena los detalles para tu nueva creaciÃ³n.
           </p>
         </div>
 
@@ -191,7 +243,7 @@ const CreateRecipePage = () => {
             <section className={styles.form_card}>
               <div className={styles.card_header}>
                 <span className="material-symbols-outlined">info</span>
-                <h3 className={styles.card_title}>Información Básica</h3>
+                <h3 className={styles.card_title}>InformaciÃ³n BÃ¡sica</h3>
               </div>
 
               <div className={styles.form_space}>
@@ -207,7 +259,276 @@ const CreateRecipePage = () => {
                 </div>
 
                 <div className={styles.form_group}>
-                  <label className={styles.form_label}>Descripción</label>
+                  <label className={styles.form_label}>DescripciÃ³n</label>
+                  <textarea
+                    name="descripcion"
+                    placeholder="Describe tu receta..."
+                    value={formData.descripcion}
+                    onChange={handleInputChange}
+                    className={styles.textarea}
+                    rows="3"
+                  />
+                </div>
+
+                <div className={styles.form_grid}>
+                  <div className={styles.form_group}>
+                    <label className={styles.form_label}>Porciones</label>
+                    <Input
+                      name="porciones"
+                      placeholder="p. ej., 24"
+                      type="number"
+                      value={formData.porciones}
+                      onChange={handleInputChange}
+                      fullWidth
+                    />
+                  </div>
+                  <div className={styles.form_group}>
+                    <label className={styles.form_label}>Tiempo Total (min)</label>
+                    <Input
+                      name="tiempo"
+                      placeholder="p. ej., 35"
+                      type="number"
+                      value={formData.tiempo}
+                      onChange={handleInputChange}
+                      fullWidth
+                    />
+                  </div>
+                  <div className={styles.form_group}>
+                    <label className={styles.form_label}>Dificultad</label>
+                    <Select
+                      name="dificultad"
+                      value={formData.dificultad}
+                      onChange={handleInputChange}
+                      options={[
+                        { value: "facil", label: "FÃ¡cil" },
+                        { value: "medio", label: "Medio" },
+                        { value: "dificil", label: "DifÃ­cil" },
+                      ]}
+                      fullWidth
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Ingredients Card */}
+            <section className={styles.form_card}>
+              <div className={styles.card_header}>
+                <span className="material-symbols-outlined">shopping_cart</span>
+                <h3 className={styles.card_title}>Ingredientes</h3>
+              </div>
+
+              <div className={styles.form_space}>
+                {formData.ingredientes.map((ingredient, index) => (
+                  <div key={index} className={styles.ingredient_row}>
+                    <Input
+                      placeholder="Nombre del ingrediente..."
+                      value={ingredient.nombre}
+                      onChange={(e) => handleIngredientChange(index, "nombre", e.target.value)}
+                      fullWidth
+                      readOnly
+                      onClick={() => handleAddIngredient(index)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <Input
+                      placeholder="Cantidad"
+                      type="number"
+                      value={ingredient.cantidad}
+                      onChange={(e) => handleIngredientChange(index, "cantidad", e.target.value)}
+                      style={{ maxWidth: "100px" }}
+                    />
+                    <Select
+                      value={ingredient.unidad}
+                      onChange={(e) => handleIngredientChange(index, "unidad", e.target.value)}
+                      options={[
+                        { value: "gramos", label: "g" },
+                        { value: "mililitros", label: "ml" },
+                        { value: "unidades", label: "ud" },
+                        { value: "cucharadas", label: "cda" },
+                        { value: "tazas", label: "taza" },
+                      ]}
+                      style={{ maxWidth: "80px" }}
+                    />
+                    {formData.ingredientes.length > 1 && (
+                      <button
+                        className={styles.remove_btn}
+                        type="button"
+                        onClick={() => handleRemoveIngredient(index)}
+                      >
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                <button
+                  className={styles.add_btn}
+                  type="button"
+                  onClick={handleAddIngredientRow}
+                >
+                  <span className="material-symbols-outlined">add</span>
+                  AÃ±adir Ingrediente
+                </button>
+              </div>
+            </section>
+
+            {/* Instructions Card */}
+            <section className={styles.form_card}>
+              <div className={styles.card_header}>
+                <span className="material-symbols-outlined">checklist</span>
+                <h3 className={styles.card_title}>Instrucciones</h3>
+              </div>
+
+              <div className={styles.form_space}>
+                {formData.instrucciones.map((instruction, index) => (
+                  <div key={index} className={styles.instruction_row}>
+                    <div className={styles.instruction_number}>
+                      <span>{instruction.paso}</span>
+                    </div>
+                    <div className={styles.instruction_input}>
+                      <textarea
+                        placeholder="Describe este paso..."
+                        value={instruction.descripcion}
+                        onChange={(e) => handleInstructionChange(index, e.target.value)}
+                        className={styles.instruction_textarea}
+                        rows="3"
+                      />
+                    </div>
+                    {formData.instrucciones.length > 1 && (
+                      <button
+                        className={styles.remove_btn}
+                        type="button"
+                        onClick={() => handleRemoveInstruction(index)}
+                      >
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                <button
+                  className={styles.add_btn}
+                  type="button"
+                  onClick={handleAddInstruction}
+                >
+                  <span className="material-symbols-outlined">add</span>
+                  AÃ±adir Paso
+                </button>
+              </div>
+            </section>
+
+            {/* Submit Button */}
+            <div className={styles.form_actions}>
+              <button
+                className={styles.cancel_btn}
+                type="button"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
+                Cancelar
+              </button>
+              <button
+                className={styles.submit_btn}
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="material-symbols-outlined">hourglass_empty</span>
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined">check</span>
+                    Guardar Receta
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Preview Column */}
+          <div className={styles.preview_column}>
+            <div className={styles.preview_card}>
+              <div className={styles.preview_image_placeholder}>
+                <span className="material-symbols-outlined">image</span>
+              </div>
+              <h4 className={styles.preview_title}>{formData.title || "Nombre de la Receta"}</h4>
+              <p className={styles.preview_description}>
+                {formData.descripcion || "AquÃ­ aparecerÃ¡ la descripciÃ³n de tu receta..."}
+              </p>
+              <div className={styles.preview_meta}>
+                <div className={styles.preview_meta_item}>
+                  <span className="material-symbols-outlined">schedule</span>
+                  <span>{formData.tiempo ? formData.tiempo + " min" : "- min"}</span>
+                </div>
+                <div className={styles.preview_meta_item}>
+                  <span className="material-symbols-outlined">restaurant</span>
+                  <span>{formData.porciones || "- porciones"}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Ingredient Modal */}
+      <IngredientModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectIngredient={handleSelectIngredient}
+        ingredients={inventoryData}
+      />
+    </div>
+  );
+};
+
+export default CreateRecipePage;
+
+  return (
+    <div className={styles.create_recipe_page}>
+      {/* Header */}
+      <Header />
+
+      {/* Navigation */}
+      <Navigation />
+
+      {/* Main Content */}
+      <main className={styles.main_content}>
+        {/* Page Header */}
+        <div className={styles.page_header}>
+          <h2 className={styles.page_title}>Crear Nueva Receta</h2>
+          <p className={styles.page_subtitle}>
+            Rellena los detalles para tu nueva creaciï¿½n.
+          </p>
+        </div>
+
+        {/* Content Grid */}
+        <div className={styles.content_grid}>
+          {/* Form Column */}
+          <div className={styles.form_column}>
+            {/* Basic Information Card */}
+            <section className={styles.form_card}>
+              <div className={styles.card_header}>
+                <span className="material-symbols-outlined">info</span>
+                <h3 className={styles.card_title}>Informaciï¿½n Bï¿½sica</h3>
+              </div>
+
+              <div className={styles.form_space}>
+                <div className={styles.form_group}>
+                  <label className={styles.form_label}>Nombre de la Receta</label>
+                  <Input
+                    name="title"
+                    placeholder="p. ej., Galletas de Chispas de Chocolate"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    fullWidth
+                  />
+                </div>
+
+                <div className={styles.form_group}>
+                  <label className={styles.form_label}>Descripciï¿½n</label>
                   <textarea
                     name="description"
                     placeholder="Describe tu receta..."
@@ -242,7 +563,7 @@ const CreateRecipePage = () => {
                     />
                   </div>
                   <div className={styles.form_group}>
-                    <label className={styles.form_label}>Tiempo de Cocción (min)</label>
+                    <label className={styles.form_label}>Tiempo de Cocciï¿½n (min)</label>
                     <Input
                       name="cookTime"
                       placeholder="p. ej., 20"
@@ -269,7 +590,7 @@ const CreateRecipePage = () => {
                   onClick={handleAddIngredientRow}
                 >
                   <span className="material-symbols-outlined">add</span>
-                  Añadir
+                  Aï¿½adir
                 </button>
               </div>
 
@@ -339,7 +660,7 @@ const CreateRecipePage = () => {
                   onClick={handleAddInstruction}
                 >
                   <span className="material-symbols-outlined">add</span>
-                  Añadir
+                  Aï¿½adir
                 </button>
               </div>
 
@@ -399,7 +720,7 @@ const CreateRecipePage = () => {
               </div>
               <h4 className={styles.preview_title}>{formData.title || "Nombre de la Receta"}</h4>
               <p className={styles.preview_description}>
-                {formData.description || "Aquí aparecerá la descripción de tu receta..."}
+                {formData.description || "Aquï¿½ aparecerï¿½ la descripciï¿½n de tu receta..."}
               </p>
               <div className={styles.preview_meta}>
                 <div className={styles.preview_meta_item}>
