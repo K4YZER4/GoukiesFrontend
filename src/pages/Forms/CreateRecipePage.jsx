@@ -53,14 +53,19 @@ const CreateRecipePage = () => {
         }
       } catch (error) {
         console.error('Error loading inventory:', error);
-        showToast('Error al cargar el inventario', 'error');
+        // Try to load from cache
+        const cached = ingredientStorage.getIngredientsMetadata();
+        if (cached?.ingredientes) {
+          setInventoryData(cached.ingredientes);
+        }
+        // Don't show toast for inventory load errors - not critical
       } finally {
         setIsLoadingInventory(false);
       }
     };
 
     loadInventory();
-  }, [user?.id, showToast]);
+  }, [user?.id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

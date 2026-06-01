@@ -5,30 +5,45 @@ import Modal from "./Modal";
 /**
  * IngredientModal Component
  * Modal to select ingredients from inventory
+ * Handles both API format (nombre) and legacy format (name)
  */
 const IngredientModal = ({ isOpen, onClose, onSelectIngredient, ingredients = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
+  // Normalize ingredients to handle both API format (nombre) and legacy format (name)
+  const normalizedIngredients = useMemo(() => {
+    return (ingredients || []).map(ing => ({
+      ...ing,
+      name: ing.name || ing.nombre || ing.ingrediente || 'Sin nombre',
+      category: ing.category || ing.tipo || 'general',
+      categoryLabel: ing.categoryLabel || ing.tipo || 'General',
+      quantityInv: ing.quantityInv || ing.cantidad_inventario || 0,
+      unit: ing.unit || ing.unidad || 'ud',
+    }));
+  }, [ingredients]);
+
   // Get unique categories from ingredients
   const categories = useMemo(() => {
-    const cats = new Set(ingredients.map(ing => ing.category || "general"));
-    return [{ id: "all", label: "Todos", count: ingredients.length }, ...Array.from(cats).map(cat => ({
+    const cats = new Set(normalizedIngredients.map(ing => ing.category || "general"));
+    return [{ id: "all", label: "Todos", count: normalizedIngredients.length }, ...Array.from(cats).map(cat => ({
       id: cat,
       label: cat,
-      count: ingredients.filter(ing => ing.category === cat).length
+      count: normalizedIngredients.filter(ing => ing.category === cat).length
     }))];
-  }, [ingredients]);
+  }, [normalizedIngredients]);
 
   // Filter ingredients based on search and category
   const filteredIngredients = useMemo(() => {
-    return ingredients.filter(ing => {
-      const matchesSearch = ing.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (ing.categoryLabel && ing.categoryLabel.toLowerCase().includes(searchTerm.toLowerCase()));
+    return normalizedIngredients.filter(ing => {
+      const name = (ing.name || '').toLowerCase();
+      const catLabel = (ing.categoryLabel || '').toLowerCase();
+      const search = (searchTerm || '').toLowerCase();
+      const matchesSearch = name.includes(search) || catLabel.includes(search);
       const matchesCategory = selectedCategory === "all" || ing.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [ingredients, searchTerm, selectedCategory]);
+  }, [normalizedIngredients, searchTerm, selectedCategory]);
 
   const handleSelectIngredient = (ingredient) => {
     onSelectIngredient(ingredient);
