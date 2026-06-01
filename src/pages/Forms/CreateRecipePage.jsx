@@ -216,16 +216,15 @@ const CreateRecipePage = () => {
         porcionesTotales: parseInt(formData.porciones) || 0,
         idUsuario: user.id,
         ingredientes: formData.ingredientes
-          .filter(ing => ing.nombre)
+          .filter(ing => ing.nombre && ing.id)
           .map(ing => ({
-            nombre: ing.nombre,
-            cantidad: parseFloat(ing.cantidad) || 0,
-            unidad: ing.unidad,
+            id_producto: ing.id,
           })),
         pasos: formData.instrucciones
           .filter(inst => inst.descripcion)
-          .map(inst => ({
-            descripcion: inst.descripcion,
+          .map((inst, index) => ({
+            paso: inst.descripcion,
+            orden: index + 1,
           })),
       };
 
