@@ -45,7 +45,11 @@ export const imageUploadService = {
       );
 
       if (!response.ok) {
-        throw new Error('Error al subir la imagen a Cloudinary');
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 400 && errorData.error?.message?.includes('Upload preset')) {
+          throw new Error('El upload preset "goukies_recipes" no existe. Créalo en Cloudinary → Settings → Upload → Upload presets (modo Unsigned)');
+        }
+        throw new Error(`Error al subir la imagen a Cloudinary: ${errorData.error?.message || response.statusText}`);
       }
 
       const data = await response.json();
