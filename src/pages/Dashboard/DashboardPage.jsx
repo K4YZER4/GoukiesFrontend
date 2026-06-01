@@ -47,7 +47,7 @@ const DashboardPage = () => {
           if (data) {
             setDashboardData(data);
             dashboardStorage.set(data); // Cache the data
-            showToast('Dashboard actualizado', 'success');
+            // No mostrar toast de éxito en carga inicial
           }
         }
       } catch (error) {

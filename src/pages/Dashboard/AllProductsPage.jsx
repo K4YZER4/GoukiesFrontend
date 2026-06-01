@@ -47,8 +47,8 @@ const AllProductsPage = () => {
           const data = await ingredientService.getAllIngredients(user.id);
           
           if (data) {
-            // The API returns an object with arrays, but we want a flat list
-            const ingredientsList = data.ingredientes || [];
+            // El API devuelve data.producto con los ingredientes del usuario
+            const ingredientsList = data.producto || [];
             setIngredients(ingredientsList);
             setFilteredIngredients(ingredientsList);
             ingredientStorage.setAll(ingredientsList); // Cache the ingredients
@@ -56,13 +56,10 @@ const AllProductsPage = () => {
             // Extract unique types for filter
             const types = [...new Set(ingredientsList.map(ing => ing.tipo))];
             setIngredientTypes(types);
-            
-            showToast('Inventario actualizado', 'success');
           }
         }
       } catch (error) {
         console.error('Error loading ingredients:', error);
-        showToast('Error al cargar el inventario', 'error');
         
         // Use cached data if available
         const cachedIngredients = ingredientStorage.getAll();
@@ -76,7 +73,7 @@ const AllProductsPage = () => {
     };
 
     loadIngredients();
-  }, [user?.id, showToast]);
+  }, [user?.id]);
 
   // Handle search/filter
   useEffect(() => {
@@ -87,7 +84,7 @@ const AllProductsPage = () => {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         ingredient =>
-          ingredient.nombre?.toLowerCase().includes(term) ||
+          ingredient.ingrediente?.toLowerCase().includes(term) ||
           ingredient.marca?.toLowerCase().includes(term)
       );
     }
@@ -193,7 +190,8 @@ const AllProductsPage = () => {
                       <th>Ingrediente</th>
                       <th>Marca</th>
                       <th>Tipo</th>
-                      <th>Cantidad</th>
+                      <th>Stock</th>
+                      <th>Precio</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>
@@ -201,7 +199,7 @@ const AllProductsPage = () => {
                     {filteredIngredients.map((ingredient) => (
                       <tr key={ingredient.id}>
                         <td className={styles.ingredient_name}>
-                          {ingredient.nombre}
+                          {ingredient.ingrediente}
                         </td>
                         <td>
                           <span className={styles.ingredient_badge}>
@@ -214,7 +212,10 @@ const AllProductsPage = () => {
                           </span>
                         </td>
                         <td className={styles.ingredient_quantity}>
-                          {ingredient.cantidad} {ingredient.unidad}
+                          {ingredient.cantidad_inventario} {ingredient.unidad}
+                        </td>
+                        <td className={styles.ingredient_price}>
+                          ${ingredient.precio_medio || '0'}
                         </td>
                         <td className={styles.ingredient_actions}>
                           <button

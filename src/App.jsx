@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
+import { MasterDataProvider } from './context/MasterDataContext.jsx';
 import { ToastContainer, ProtectedRoute } from './components/Common';
 
 // Import pages
@@ -33,30 +34,32 @@ const App = () => {
   return (
     <AuthProvider>
       <ToastProvider>
-        <Router>
-          <ToastContainer />
-          <Routes>
-            {/* Authentication Routes - Públicas */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+        <MasterDataProvider>
+          <Router>
+            <ToastContainer />
+            <Routes>
+              {/* Authentication Routes - Públicas */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            {/* Dashboard & Main Routes - Protegidas */}
-            <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              {/* Dashboard & Main Routes - Protegidas */}
+              <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-            {/* Recipes Routes - Protegidas */}
-            <Route path="/recetas" element={<ProtectedRoute element={<AllRecipesPage />} />} />
-            <Route path="/recetas/:id" element={<ProtectedRoute element={<SelectedRecipePage />} />} />
-            <Route path="/nueva-receta" element={<ProtectedRoute element={<CreateRecipePage />} />} />
+              {/* Recipes Routes - Protegidas */}
+              <Route path="/recetas" element={<ProtectedRoute element={<AllRecipesPage />} />} />
+              <Route path="/recetas/:id" element={<ProtectedRoute element={<SelectedRecipePage />} />} />
+              <Route path="/nueva-receta" element={<ProtectedRoute element={<CreateRecipePage />} />} />
 
-            {/* Inventory/Products Routes - Protegidas */}
-            <Route path="/inventario" element={<ProtectedRoute element={<AllProductsPage />} />} />
-            <Route path="/nuevo-ingrediente" element={<ProtectedRoute element={<CreateProductPage />} />} />
+              {/* Inventory/Products Routes - Protegidas */}
+              <Route path="/inventario" element={<ProtectedRoute element={<AllProductsPage />} />} />
+              <Route path="/nuevo-ingrediente" element={<ProtectedRoute element={<CreateProductPage />} />} />
 
-            {/* 404 - Not Found (redirect to dashboard) */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </Router>
+              {/* 404 - Not Found (redirect to dashboard) */}
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </Router>
+        </MasterDataProvider>
       </ToastProvider>
     </AuthProvider>
   );

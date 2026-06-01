@@ -218,6 +218,11 @@
   font-weight: var(--font-weight-bold);
 }
 
+.ingredient_price {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
 /* ==========================================
    ACTION BUTTONS
    ========================================== */

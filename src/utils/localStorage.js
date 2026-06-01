@@ -11,6 +11,7 @@ const KEYS = {
   SELECTED_RECIPE: 'goukies_selected_recipe',
   SELECTED_INGREDIENT: 'goukies_selected_ingredient',
   DASHBOARD: 'goukies_dashboard',
+  MASTER_DATA: 'goukies_master_data', // marcas, tipos, unidades, ingredientes globales
 };
 
 /**
@@ -98,6 +99,44 @@ export const dashboardStorage = {
   clearDashboard: () => removeLocalStorage(KEYS.DASHBOARD),
 };
 
+export const masterDataStorage = {
+  setMasterData: (data) => setLocalStorage(KEYS.MASTER_DATA, data),
+  getMasterData: () => getLocalStorage(KEYS.MASTER_DATA),
+  setMarcas: (marcas) => {
+    const data = masterDataStorage.getMasterData() || {};
+    setLocalStorage(KEYS.MASTER_DATA, { ...data, marca: marcas });
+  },
+  getMarcas: () => {
+    const data = masterDataStorage.getMasterData();
+    return data?.marca || [];
+  },
+  setTipos: (tipos) => {
+    const data = masterDataStorage.getMasterData() || {};
+    setLocalStorage(KEYS.MASTER_DATA, { ...data, tipo: tipos });
+  },
+  getTipos: () => {
+    const data = masterDataStorage.getMasterData();
+    return data?.tipo || [];
+  },
+  setUnidades: (unidades) => {
+    const data = masterDataStorage.getMasterData() || {};
+    setLocalStorage(KEYS.MASTER_DATA, { ...data, unidad: unidades });
+  },
+  getUnidades: () => {
+    const data = masterDataStorage.getMasterData();
+    return data?.unidad || [];
+  },
+  setIngredientes: (ingredientes) => {
+    const data = masterDataStorage.getMasterData() || {};
+    setLocalStorage(KEYS.MASTER_DATA, { ...data, ingredientes });
+  },
+  getIngredientes: () => {
+    const data = masterDataStorage.getMasterData();
+    return data?.ingredientes || [];
+  },
+  clearMasterData: () => removeLocalStorage(KEYS.MASTER_DATA),
+};
+
 export default {
   KEYS,
   setLocalStorage,
@@ -108,4 +147,5 @@ export default {
   recipeStorage,
   ingredientStorage,
   dashboardStorage,
+  masterDataStorage,
 };

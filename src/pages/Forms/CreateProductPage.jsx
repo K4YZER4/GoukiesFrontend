@@ -5,6 +5,7 @@ import { Header, Navigation } from '../../components/Layout';
 import { Input, Select } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import { useMasterData } from '../../hooks/useMasterData';
 import ingredientService from '../../services/ingredientService';
 import { ingredientStorage } from '../../utils/localStorage';
 
@@ -16,33 +17,17 @@ const CreateProductPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { marcas, tipos, unidades, isLoading: isMasterDataLoading } = useMasterData();
 
   const [formData, setFormData] = useState({
     nombre: '',
-    marca: '',
-    tipo: '',
+    marca_id: '',
+    tipo_id: '',
     cantidad: '',
-    unidad: 'gramos',
+    unidad_id: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const tipos = [
-    'Ingredientes Secos',
-    'Lácteos',
-    'Extras',
-    'Saborizantes',
-    'Levadura',
-    'Otros',
-  ];
-
-  const unidades = [
-    { value: 'gramos', label: 'Gramos (g)' },
-    { value: 'kilogramos', label: 'Kilogramos (kg)' },
-    { value: 'mililitros', label: 'Mililitros (ml)' },
-    { value: 'litros', label: 'Litros (l)' },
-    { value: 'unidades', label: 'Unidades (ud)' },
-  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +46,12 @@ const CreateProductPage = () => {
       return;
     }
 
-    if (!formData.tipo) {
+    if (!formData.marca_id) {
+      showToast('Selecciona una marca', 'error');
+      return;
+    }
+
+    if (!formData.tipo_id) {
       showToast('Selecciona un tipo de ingrediente', 'error');
       return;
     }
@@ -71,17 +61,22 @@ const CreateProductPage = () => {
       return;
     }
 
+    if (!formData.unidad_id) {
+      showToast('Selecciona una unidad de medida', 'error');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
-      // Prepare data for API
+      // Prepare data for API - usando IDs de los datos maestros
       const ingredientData = {
         id_usuario: user.id,
         nombre: formData.nombre,
-        marca: formData.marca || null,
-        tipo: formData.tipo,
+        marca_id: parseInt(formData.marca_id),
+        tipo_id: parseInt(formData.tipo_id),
         cantidad: parseFloat(formData.cantidad),
-        unidad: formData.unidad,
+        unidad_id: parseInt(formData.unidad_id),
       };
 
       // Call API to create ingredient
@@ -97,10 +92,10 @@ const CreateProductPage = () => {
         // Reset form and redirect
         setFormData({
           nombre: '',
-          marca: '',
-          tipo: '',
+          marca_id: '',
+          tipo_id: '',
           cantidad: '',
-          unidad: 'gramos',
+          unidad_id: '',
         });
 
         // Redirect to inventory page
@@ -146,7 +141,7 @@ const CreateProductPage = () => {
   };
 
   const handleCancel = () => {
-    if (formData.nombre || formData.marca || formData.tipo || formData.cantidad) {
+    if (formData.nombre || formData.marca_id || formData.tipo_id || formData.cantidad) {
       if (confirm('¿Descartar cambios?')) {
         navigate('/inventario');
       }
@@ -210,38 +205,41 @@ const CreateProductPage = () => {
                 />
               </div>
 
-              {/* Brand */}
-              <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="marca">
-                  Marca (Opcional)
-                </label>
-                <Input
-                  id="marca"
-                  name="marca"
-                  placeholder="p. ej., La Copetera"
-                  value={formData.marca}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </div>
+               {/* Brand */}
+               <div className={styles.form_group}>
+                 <label className={styles.form_label} htmlFor="marca_id">
+                   Marca
+                 </label>
+                 <Select
+                   id="marca_id"
+                   name="marca_id"
+                   value={formData.marca_id}
+                   onChange={handleInputChange}
+                   options={[
+                     { value: '', label: 'Selecciona una marca' },
+                     ...marcas.map(marca => ({ value: marca.id.toString(), label: marca.nombre })),
+                   ]}
+                   fullWidth
+                 />
+               </div>
 
-              {/* Type */}
-              <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="tipo">
-                  Tipo de Ingrediente
-                </label>
-                <Select
-                  id="tipo"
-                  name="tipo"
-                  value={formData.tipo}
-                  onChange={handleInputChange}
-                  options={[
-                    { value: '', label: 'Selecciona un tipo' },
-                    ...tipos.map(tipo => ({ value: tipo, label: tipo })),
-                  ]}
-                  fullWidth
-                />
-              </div>
+               {/* Type */}
+               <div className={styles.form_group}>
+                 <label className={styles.form_label} htmlFor="tipo_id">
+                   Tipo de Ingrediente
+                 </label>
+                 <Select
+                   id="tipo_id"
+                   name="tipo_id"
+                   value={formData.tipo_id}
+                   onChange={handleInputChange}
+                   options={[
+                     { value: '', label: 'Selecciona un tipo' },
+                     ...tipos.map(tipo => ({ value: tipo.id.toString(), label: tipo.nombre })),
+                   ]}
+                   fullWidth
+                 />
+               </div>
 
               {/* Quantity */}
               <div className={styles.form_group}>
@@ -264,19 +262,22 @@ const CreateProductPage = () => {
                 </div>
               </div>
 
-              {/* Unit */}
-              <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="unidad">
-                  Unidad de Medida
-                </label>
-                <Select
-                  id="unidad"
-                  name="unidad"
-                  value={formData.unidad}
-                  onChange={handleInputChange}
-                  options={unidades}
-                />
-              </div>
+               {/* Unit */}
+               <div className={styles.form_group}>
+                 <label className={styles.form_label} htmlFor="unidad_id">
+                   Unidad de Medida
+                 </label>
+                 <Select
+                   id="unidad_id"
+                   name="unidad_id"
+                   value={formData.unidad_id}
+                   onChange={handleInputChange}
+                   options={[
+                     { value: '', label: 'Selecciona una unidad' },
+                     ...unidades.map(unidad => ({ value: unidad.id.toString(), label: unidad.nombre })),
+                   ]}
+                 />
+               </div>
             </div>
 
             {/* Actions */}
