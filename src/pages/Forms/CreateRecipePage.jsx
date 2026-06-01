@@ -218,15 +218,37 @@ const CreateRecipePage = () => {
         porcionesTotales: parseInt(formData.porciones) || 0,
         idUsuario: user.id,
         ...(formData.imagenUrl && { imagenURL: formData.imagenUrl }),
-        ingredientes: formData.ingredientes
-          .filter(ing => ing.nombre && ing.id)
-          .map(ing => {
-            console.log('📦 Ingredient being sent:', JSON.stringify({ id: ing.id, nombre: ing.nombre }));
-            return {
-              id_producto: ing.id,
-              cantidad: parseFloat(ing.cantidad) || 0,
-            };
-          }),
+        ingredientes: (() => {
+          // Agrupar por id_producto para evitar duplicados (unique constraint)
+          const grouped = {};
+          let skippedCount = 0;
+          formData.ingredientes
+            .filter(ing => ing.nombre && ing.id)
+            .forEach(ing => {
+              // Validar UUID: formato xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+              const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ing.id);
+              if (!isUUID) {
+                console.warn('⚠️ Ingredient skipped - invalid UUID:', ing.id, ing.nombre);
+                skippedCount++;
+                return;
+              }
+              if (grouped[ing.id]) {
+                grouped[ing.id].cantidad += parseFloat(ing.cantidad) || 0;
+              } else {
+                grouped[ing.id] = {
+                  id_producto: ing.id,
+                  cantidad: parseFloat(ing.cantidad) || 0,
+                };
+              }
+            });
+          
+          const result = Object.values(grouped);
+          console.log('📦 Ingredients to send:', JSON.stringify(result));
+          if (skippedCount > 0) {
+            showToast(`${skippedCount} ingrediente(s) omitido(s) por ID inválido`, 'warning');
+          }
+          return result;
+        })(),
         pasos: formData.instrucciones
           .filter(inst => inst.descripcion)
           .map((inst, index) => ({
