@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateRecipePage.module.css";
 import { Header, Navigation } from "../../components/Layout";
@@ -8,6 +8,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../hooks/useToast";
 import recipeService from "../../services/recipeService";
 import ingredientService from "../../services/ingredientService";
+import imageUploadService from "../../services/imageUploadService";
 import { recipeStorage } from "../../utils/localStorage";
 
 /**
@@ -18,10 +19,12 @@ const CreateRecipePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const fileInputRef = useRef(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalIngredientIndex, setModalIngredientIndex] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [inventoryData, setInventoryData] = useState([]);
   const [isLoadingInventory, setIsLoadingInventory] = useState(true);
   
@@ -32,6 +35,7 @@ const CreateRecipePage = () => {
     porciones: "",
     tiempo: "",
     imagen: null,
+    imagenUrl: null, // Para guardar la URL de Cloudinary
     ingredientes: [{ nombre: "", cantidad: "", unidad: "gramos", id: null }],
     instrucciones: [{ paso: 1, descripcion: "" }],
   });
@@ -134,6 +138,47 @@ const CreateRecipePage = () => {
       newInstrucciones[index].descripcion = value;
       return { ...prev, instrucciones: newInstrucciones };
     });
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // Validar imagen
+      const validation = imageUploadService.validateImage(file);
+      if (!validation.isValid) {
+        showToast(validation.error, 'error');
+        return;
+      }
+
+      setIsUploadingImage(true);
+
+      // Subir a Cloudinary
+      const imageUrl = await imageUploadService.uploadImage(file);
+
+      // Guardar URL en formData
+      setFormData((prev) => ({
+        ...prev,
+        imagen: file,
+        imagenUrl: imageUrl,
+      }));
+
+      showToast('¡Imagen subida exitosamente!', 'success');
+    } catch (error) {
+      console.error('Image upload error:', error);
+      showToast(error.message || 'Error al subir la imagen', 'error');
+    } finally {
+      setIsUploadingImage(false);
+      // Limpiar input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -451,9 +496,68 @@ const CreateRecipePage = () => {
           {/* Preview Column */}
           <div className={styles.preview_column}>
             <div className={styles.preview_card}>
-              <div className={styles.preview_image_placeholder}>
-                <span className="material-symbols-outlined">image</span>
+              {/* Clickable Image Area */}
+              <div 
+                className={styles.preview_image_placeholder}
+                onClick={handleImageClick}
+                style={{ cursor: 'pointer', position: 'relative' }}
+              >
+                {formData.imagenUrl ? (
+                  <>
+                    <img 
+                      src={formData.imagenUrl} 
+                      alt="Preview"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: 'inherit',
+                      }}
+                    />
+                    {!isUploadingImage && (
+                      <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 'inherit',
+                        opacity: 0,
+                        transition: 'opacity 0.3s',
+                        ':hover': { opacity: 1 }
+                      }}>
+                        <span className="material-symbols-outlined" style={{ color: 'white', fontSize: '2rem' }}>
+                          edit
+                        </span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {isUploadingImage ? (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                        <LoadingSpinner />
+                      </div>
+                    ) : (
+                      <span className="material-symbols-outlined">image</span>
+                    )}
+                  </>
+                )}
               </div>
+              
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: 'none' }}
+              />
+
               <h4 className={styles.preview_title}>{formData.title || "Nombre de la Receta"}</h4>
               <p className={styles.preview_description}>
                 {formData.descripcion || "Aquí aparecerá la descripción de tu receta..."}

@@ -425,3 +425,120 @@
   font-size: var(--font-size-body-md);
   margin: 0;
 }
+
+/* ==========================================
+   EMPTY STATE
+   ========================================== */
+
+.dashboard_empty_state {
+  background: linear-gradient(135deg, rgba(112, 85, 45, 0.05) 0%, rgba(187, 144, 85, 0.05) 100%);
+  border: 2px dashed var(--color-outline-variant);
+  border-radius: var(--border-radius-lg);
+  padding: 3rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20rem;
+}
+
+.empty_state_content {
+  text-align: center;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.empty_state_title {
+  font-family: var(--font-headline);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.empty_state_description {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-on-surface-variant);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.empty_state_ctas {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .empty_state_ctas {
+    gap: 0.75rem;
+  }
+}
+
+.primary_cta_btn {
+  padding: 1rem 2rem;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-bottom: 3px solid #5b421c;
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 12px rgba(112, 85, 45, 0.25);
+  transition: all 0.2s ease;
+}
+
+.primary_cta_btn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(112, 85, 45, 0.35);
+}
+
+.primary_cta_btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.primary_cta_btn span {
+  font-size: 1.25rem;
+}
+
+.secondary_cta_btn {
+  padding: 1rem 2rem;
+  background-color: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+  border: 2px solid var(--color-outline-variant);
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.secondary_cta_btn:hover {
+  background-color: var(--color-primary-container);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary-container);
+}
+
+.secondary_cta_btn:active {
+  transform: translateY(2px);
+}
+
+.secondary_cta_btn span {
+  font-size: 1.25rem;
+}

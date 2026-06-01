@@ -88,9 +88,10 @@ const DashboardPage = () => {
     );
   }
 
-  // Use API data if available, fallback to mock data
-  const recentRecipes = dashboardData?.recetas || mockRecentRecipes;
-  const inventory = dashboardData?.ingredientes || mockInventory;
+  // Use API data - no fallback to mock data
+  const recentRecipes = dashboardData?.recetas || [];
+  const inventory = dashboardData?.ingredientes || [];
+  const hasData = (recentRecipes && recentRecipes.length > 0) || (inventory && inventory.length > 0);
 
   return (
     <div className={styles.dashboard_page}>
@@ -109,133 +110,152 @@ const DashboardPage = () => {
               ¡Bienvenido de nuevo, {user?.nombre || 'Chef'}! 🍪
             </h2>
             <p className={styles.dashboard_welcome_subtitle}>
-              Esto es lo que está pasando con tus deliciosas recetas hoy. ¡Es un buen día para hornear!
+              {hasData 
+                ? 'Esto es lo que está pasando con tus deliciosas recetas hoy. ¡Es un buen día para hornear!'
+                : '¡Bienvenido a Goukies! Para empezar, puedes añadir ingredientes y recetas para tener información en esta pantalla.'}
             </p>
           </section>
 
-          {/* Stats Grid */}
-          <section className={styles.dashboard_stats}>
-            {mockStats.map((stat) => (
-              <StatCard
-                key={stat.id}
-                icon={stat.icon}
-                title={stat.title}
-                value={stat.value}
-                variant={stat.variant}
-              />
-            ))}
-          </section>
+          {/* Empty State - Show when no data */}
+          {!hasData && (
+            <section className={styles.dashboard_empty_state}>
+              <div className={styles.empty_state_content}>
+                <span className="material-symbols-outlined" style={{ fontSize: '3rem', color: 'var(--color-primary)' }}>
+                  shopping_cart
+                </span>
+                <h3 className={styles.empty_state_title}>¡Comencemos! 🎉</h3>
+                <p className={styles.empty_state_description}>
+                  Aún no tienes ingredientes ni recetas. Crea tu primera receta o añade ingredientes para comenzar a gestionar tu cocina.
+                </p>
+                <div className={styles.empty_state_ctas}>
+                  <button 
+                    className={styles.primary_cta_btn}
+                    onClick={() => navigate('/nueva-receta')}
+                  >
+                    <span className="material-symbols-outlined">add</span>
+                    Crear Nueva Receta
+                  </button>
+                  <button 
+                    className={styles.secondary_cta_btn}
+                    onClick={handleAddIngredient}
+                  >
+                    <span className="material-symbols-outlined">inventory_2</span>
+                    Añadir Ingrediente
+                  </button>
+                </div>
+              </div>
+            </section>
+          )}
 
-          {/* Featured Recipe Hero */}
-          <section className={styles.dashboard_featured}>
-            <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFk2clhnPJhCuCaAtlLhxMd5DkqknmVS29idSUSp-WXVFK89I__8Wauynz0V5QPF1iN51gWdRtbpainEpge1bb0l-feb9bUpZ8iY07Y-I31UgYnZ9QNmWWnraAKErAPL8O0M6S7QVHwr15H4YCreYFUlGgGsL0TjtVL-MqHtqG3xl5vzw0GQppGGssBJhUUlWgjqKRwFQOvyd8FFS_j5jGQMlANOpo__SR_2RhorbQqLmr8BzE96FPSL06V6_zUCGFjKQbtThyS1KF"
-              alt="Receta destacada"
-              className={styles.dashboard_featured_image}
-            />
-            <div className={styles.dashboard_featured_overlay}></div>
-            <div className={styles.dashboard_featured_content}>
-              <span className={styles.dashboard_featured_badge}>Receta de la Semana</span>
-              <h3 className={styles.dashboard_featured_title}>
-                Chispas de Chocolate Clásicas
-              </h3>
-              <p className={styles.dashboard_featured_description}>
-                La perfección dorada con bordes crujientes y un centro suave que se derrite en tu boca.
-                Una receta infalible para cualquier ocasión.
-              </p>
-            </div>
-          </section>
+          {/* Stats Grid - Show when there's data */}
+          {hasData && (
+            <section className={styles.dashboard_stats}>
+              {mockStats.map((stat) => (
+                <StatCard
+                  key={stat.id}
+                  icon={stat.icon}
+                  title={stat.title}
+                  value={stat.value}
+                  variant={stat.variant}
+                />
+              ))}
+            </section>
+          )}
 
           {/* Recent Recipes Section */}
-          <section className={styles.dashboard_recipes_section}>
-            <div className={styles.dashboard_section_header}>
-              <h3 className={styles.dashboard_section_title}>Recetas Recientes</h3>
-              <button 
-                className={styles.dashboard_view_all_btn}
-                onClick={handleViewAllRecipes}
-              >
-                Ver todas
-                <span className="material-symbols-outlined">arrow_forward</span>
-              </button>
-            </div>
-            <div className={styles.dashboard_recipes_grid}>
-              {recentRecipes && recentRecipes.length > 0 ? (
-                recentRecipes.map((recipe) => (
-                  <RecipeCard
-                    key={recipe.id}
-                    id={recipe.id}
-                    image={recipe.image}
-                    title={recipe.title}
-                    description={recipe.description}
-                    rating={recipe.rating}
-                    difficulty={recipe.difficulty}
-                    time={recipe.time}
-                  />
-                ))
-              ) : (
-                <p className={styles.empty_message}>No hay recetas aún. ¡Crea una nueva!</p>
-              )}
-            </div>
-          </section>
+          {hasData && (
+            <section className={styles.dashboard_recipes_section}>
+              <div className={styles.dashboard_section_header}>
+                <h3 className={styles.dashboard_section_title}>Recetas Recientes</h3>
+                <button 
+                  className={styles.dashboard_view_all_btn}
+                  onClick={handleViewAllRecipes}
+                >
+                  Ver todas
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
+              </div>
+              <div className={styles.dashboard_recipes_grid}>
+                {recentRecipes && recentRecipes.length > 0 ? (
+                  recentRecipes.map((recipe) => (
+                    <RecipeCard
+                      key={recipe.id}
+                      id={recipe.id}
+                      image={recipe.image}
+                      title={recipe.title}
+                      description={recipe.description}
+                      rating={recipe.rating}
+                      difficulty={recipe.difficulty}
+                      time={recipe.time}
+                    />
+                  ))
+                ) : (
+                  <p className={styles.empty_message}>No hay recetas aún. ¡Crea una nueva!</p>
+                )}
+              </div>
+            </section>
+          )}
 
           {/* Inventory Preview */}
-          <section className={styles.dashboard_inventory_section}>
-            <div className={styles.dashboard_section_header}>
-              <h3 className={styles.dashboard_section_title}>Inventario de Ingredientes</h3>
-              <button 
-                className={styles.dashboard_add_ingredient_btn}
-                onClick={handleAddIngredient}
-              >
-                + Añadir Ingrediente
-              </button>
-            </div>
+          {hasData && (
+            <section className={styles.dashboard_inventory_section}>
+              <div className={styles.dashboard_section_header}>
+                <h3 className={styles.dashboard_section_title}>Inventario de Ingredientes</h3>
+                <button 
+                  className={styles.dashboard_add_ingredient_btn}
+                  onClick={handleAddIngredient}
+                >
+                  + Añadir Ingrediente
+                </button>
+              </div>
 
-            <div className={styles.dashboard_inventory_table}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Ingrediente</th>
-                    <th>Categoría</th>
-                    <th>Stock</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventory && inventory.length > 0 ? (
-                    inventory.map((item) => (
-                      <tr key={item.id}>
-                        <td className={styles.inventory_name}>{item.name}</td>
-                        <td>
-                          <span className={styles.inventory_badge}>{item.category}</span>
-                        </td>
-                        <td className={styles.inventory_quantity}>
-                          {item.quantity} {item.unit}
-                        </td>
-                        <td>
-                          <div className={styles.inventory_status}>
-                            <span
-                              className={`${styles.inventory_status_dot} ${
-                                item.status === 'Suficiente'
-                                  ? styles.status_success
-                                  : styles.status_warning
-                              }`}
-                            ></span>
-                            <span>{item.status}</span>
-                          </div>
+              <div className={styles.dashboard_inventory_table}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Ingrediente</th>
+                      <th>Categoría</th>
+                      <th>Stock</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inventory && inventory.length > 0 ? (
+                      inventory.map((item) => (
+                        <tr key={item.id}>
+                          <td className={styles.inventory_name}>{item.name}</td>
+                          <td>
+                            <span className={styles.inventory_badge}>{item.category}</span>
+                          </td>
+                          <td className={styles.inventory_quantity}>
+                            {item.quantity} {item.unit}
+                          </td>
+                          <td>
+                            <div className={styles.inventory_status}>
+                              <span
+                                className={`${styles.inventory_status_dot} ${
+                                  item.status === 'Suficiente'
+                                    ? styles.status_success
+                                    : styles.status_warning
+                                }`}
+                              ></span>
+                              <span>{item.status}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className={styles.empty_message}>
+                          No hay ingredientes. ¡Añade uno para comenzar!
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className={styles.empty_message}>
-                        No hay ingredientes. ¡Añade uno para comenzar!
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
         </div>
       </main>
 

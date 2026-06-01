@@ -110,7 +110,35 @@ const CreateProductPage = () => {
       }
     } catch (error) {
       console.error('Error creating ingredient:', error);
-      const errorMessage = error.response?.data?.message || 'Error al añadir el ingrediente';
+      
+      // Detailed error handling for different scenarios
+      let errorMessage = 'Error al añadir el ingrediente';
+      
+      if (error.response?.status === 400) {
+        // Bad request - validation or missing data
+        const data = error.response.data;
+        if (data?.message?.includes('marca')) {
+          errorMessage = 'Por favor proporciona una marca o usa "Sin marca"';
+        } else if (data?.message?.includes('tipo')) {
+          errorMessage = 'El tipo de ingrediente es requerido';
+        } else if (data?.message?.includes('cantidad')) {
+          errorMessage = 'La cantidad debe ser un número válido';
+        } else if (data?.message) {
+          errorMessage = data.message;
+        }
+      } else if (error.response?.status === 404) {
+        // Not found - likely missing marca or tipo
+        errorMessage = 'No se encontró la marca o tipo especificado. Verifica los datos.';
+      } else if (error.response?.status === 409) {
+        // Conflict - likely duplicate
+        errorMessage = 'Este ingrediente ya existe en tu inventario';
+      } else if (error.response?.status === 500) {
+        // Server error
+        errorMessage = 'Error del servidor. Intenta más tarde.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Error de conexión. Verifica tu internet.';
+      }
+      
       showToast(errorMessage, 'error');
     } finally {
       setIsSubmitting(false);
