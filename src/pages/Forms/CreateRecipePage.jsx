@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./CreateRecipePage.module.css";
 import { Header, Navigation } from "../../components/Layout";
 import { LoadingSpinner } from "../../components/Common";
@@ -9,7 +9,7 @@ import { useToast } from "../../hooks/useToast";
 import recipeService from "../../services/recipeService";
 import ingredientService from "../../services/ingredientService";
 import imageUploadService from "../../services/imageUploadService";
-import { recipeStorage } from "../../utils/localStorage";
+import { recipeStorage, ingredientStorage } from "../../utils/localStorage";
 
 /**
  * CreateRecipePage Component
@@ -17,9 +17,12 @@ import { recipeStorage } from "../../utils/localStorage";
  */
 const CreateRecipePage = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const { user } = useAuth();
   const { showToast } = useToast();
   const fileInputRef = useRef(null);
+
+  const isEditing = Boolean(id);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalIngredientIndex, setModalIngredientIndex] = useState(null);
@@ -27,6 +30,7 @@ const CreateRecipePage = () => {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [inventoryData, setInventoryData] = useState([]);
   const [isLoadingInventory, setIsLoadingInventory] = useState(true);
+  const [isLoadingRecipe, setIsLoadingRecipe] = useState(false);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -68,6 +72,50 @@ const CreateRecipePage = () => {
 
     loadInventory();
   }, [user?.id]);
+
+  // Load recipe data when editing
+  useEffect(() => {
+    if (!id || !user?.id) return;
+
+    const loadRecipe = async () => {
+      try {
+        setIsLoadingRecipe(true);
+        const data = await recipeService.getRecipeById(id, user.id);
+        if (data) {
+          setFormData({
+            title: data.nombre || '',
+            descripcion: data.descripcion || '',
+            dificultad: 'facil',
+            porciones: String(data.porciones_totales || data.profit || ''),
+            tiempo: '',
+            imagen: null,
+            imagenUrl: data.imagen_url || null,
+            ingredientes: Array.isArray(data.ingredientes) && data.ingredientes.length > 0
+              ? data.ingredientes.map(ing => ({
+                  nombre: ing.ingrediente_nombre || ing.nombre || '',
+                  cantidad: String(ing.cantidad || ''),
+                  unidad: ing.unidad || 'gramos',
+                  id: ing.id_producto || ing.id,
+                }))
+              : [{ nombre: "", cantidad: "", unidad: "gramos", id: null }],
+            instrucciones: Array.isArray(data.pasos) && data.pasos.length > 0
+              ? data.pasos.map((p, i) => ({
+                  paso: i + 1,
+                  descripcion: p.paso || p.descripcion || '',
+                }))
+              : [{ paso: 1, descripcion: "" }],
+          });
+        }
+      } catch (error) {
+        console.error('Error loading recipe for edit:', error);
+        showToast('Error al cargar la receta', 'error');
+      } finally {
+        setIsLoadingRecipe(false);
+      }
+    };
+
+    loadRecipe();
+  }, [id, user?.id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -257,22 +305,24 @@ const CreateRecipePage = () => {
           })),
       };
 
-      // Call API to create recipe
-      const response = await recipeService.createRecipe(recipeData);
+      // Call API to create or update recipe
+      const response = isEditing
+        ? await recipeService.updateRecipe(id, recipeData)
+        : await recipeService.createRecipe(recipeData);
 
       if (response) {
-        showToast('¡Receta creada exitosamente!', 'success');
+        showToast(isEditing ? '¡Receta actualizada exitosamente!' : '¡Receta creada exitosamente!', 'success');
         
-        // Update local cache
-        const cachedRecipes = recipeStorage.getAll() || [];
-        recipeStorage.setAll([...cachedRecipes, response]);
+        if (!isEditing) {
+          const cachedRecipes = recipeStorage.getAll() || [];
+          recipeStorage.setAll([...cachedRecipes, response]);
+        }
 
-        // Redirect to recipes page
         navigate('/recetas');
       }
     } catch (error) {
-      console.error('Error creating recipe:', error);
-      const errorMessage = error.response?.data?.message || 'Error al crear la receta';
+      console.error(isEditing ? 'Error updating recipe:' : 'Error creating recipe:', error);
+      const errorMessage = error.response?.data?.message || (isEditing ? 'Error al actualizar la receta' : 'Error al crear la receta');
       showToast(errorMessage, 'error');
     } finally {
       setIsSubmitting(false);
@@ -285,7 +335,7 @@ const CreateRecipePage = () => {
     }
   };
 
-  if (isLoadingInventory) {
+  if (isLoadingInventory || isLoadingRecipe) {
     return (
       <div className={styles.create_recipe_page}>
         <Header />
@@ -309,9 +359,9 @@ const CreateRecipePage = () => {
       <main className={styles.main_content}>
         {/* Page Header */}
         <div className={styles.page_header}>
-          <h2 className={styles.page_title}>Crear Nueva Receta</h2>
+          <h2 className={styles.page_title}>{isEditing ? 'Editar Receta' : 'Crear Nueva Receta'}</h2>
           <p className={styles.page_subtitle}>
-            Rellena los detalles para tu nueva creación.
+            {isEditing ? 'Modifica los detalles de tu receta.' : 'Rellena los detalles para tu nueva creación.'}
           </p>
         </div>
 
@@ -521,7 +571,7 @@ const CreateRecipePage = () => {
                 ) : (
                   <>
                     <span className="material-symbols-outlined">check</span>
-                    Guardar Receta
+                    {isEditing ? 'Guardar Cambios' : 'Guardar Receta'}
                   </>
                 )}
               </button>

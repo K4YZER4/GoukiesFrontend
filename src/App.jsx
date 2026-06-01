@@ -48,6 +48,7 @@ const App = () => {
             <Route path="/recetas" element={<ProtectedRoute element={<AllRecipesPage />} />} />
             <Route path="/recetas/:id" element={<ProtectedRoute element={<SelectedRecipePage />} />} />
             <Route path="/nueva-receta" element={<ProtectedRoute element={<CreateRecipePage />} />} />
+            <Route path="/recetas/:id/editar" element={<ProtectedRoute element={<CreateRecipePage />} />} />
 
             {/* Inventory/Products Routes - Protegidas */}
             <Route path="/inventario" element={<ProtectedRoute element={<AllProductsPage />} />} />

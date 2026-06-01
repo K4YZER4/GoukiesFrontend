@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './DashboardPage.module.css';
 import { Header, Navigation, MobileBottomNav } from '../../components/Layout';
@@ -8,7 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import dashboardService from '../../services/dashboardService';
 import { dashboardStorage } from '../../utils/localStorage';
-import { mockStats, mockRecentRecipes, mockInventory } from './mockData';
+import { normalizeRecipes } from '../../utils/normalizeRecipe';
 
 /**
  * DashboardPage Component
@@ -67,6 +67,41 @@ const DashboardPage = () => {
     loadDashboardData();
   }, [user?.id, showToast]);
 
+  // Compute all derived data BEFORE any conditional return (Rules of Hooks)
+  const recentRecipes = useMemo(() => normalizeRecipes(dashboardData?.recetas), [dashboardData?.recetas]);
+  const inventory = dashboardData?.ingredientes || [];
+  const hasData = (recentRecipes && recentRecipes.length > 0) || (inventory && inventory.length > 0);
+
+  const stats = useMemo(() => {
+    const s = dashboardData?.stats;
+    const totalRecetas = s?.total_recetas ?? recentRecipes.length;
+    const totalIngredientes = s?.total_ingredientes ?? inventory.length;
+    const categorias = new Set(inventory.map(i => i.categoria).filter(Boolean));
+    return [
+      {
+        id: 1,
+        icon: '🍪',
+        title: 'Recetas Totales',
+        value: String(totalRecetas),
+        variant: 'default',
+      },
+      {
+        id: 2,
+        icon: '📦',
+        title: 'Ingredientes',
+        value: String(totalIngredientes),
+        variant: 'default',
+      },
+      {
+        id: 3,
+        icon: '🍴',
+        title: 'Categorías',
+        value: String(categorias.size || totalIngredientes > 0 ? categorias.size : '—'),
+        variant: 'default',
+      },
+    ];
+  }, [dashboardData?.stats, recentRecipes.length, inventory]);
+
   const handleViewAllRecipes = () => {
     navigate('/recetas');
   };
@@ -87,11 +122,6 @@ const DashboardPage = () => {
       </div>
     );
   }
-
-  // Use API data - no fallback to mock data
-  const recentRecipes = dashboardData?.recetas || [];
-  const inventory = dashboardData?.ingredientes || [];
-  const hasData = (recentRecipes && recentRecipes.length > 0) || (inventory && inventory.length > 0);
 
   return (
     <div className={styles.dashboard_page}>
@@ -150,7 +180,7 @@ const DashboardPage = () => {
           {/* Stats Grid - Show when there's data */}
           {hasData && (
             <section className={styles.dashboard_stats}>
-              {mockStats.map((stat) => (
+              {stats.map((stat) => (
                 <StatCard
                   key={stat.id}
                   icon={stat.icon}
@@ -176,17 +206,15 @@ const DashboardPage = () => {
                 </button>
               </div>
               <div className={styles.dashboard_recipes_grid}>
-                {recentRecipes && recentRecipes.length > 0 ? (
+                  {recentRecipes && recentRecipes.length > 0 ? (
                   recentRecipes.map((recipe) => (
                     <RecipeCard
                       key={recipe.id}
                       id={recipe.id}
                       image={recipe.image}
                       title={recipe.title}
-                      description={recipe.description}
-                      rating={recipe.rating}
-                      difficulty={recipe.difficulty}
-                      time={recipe.time}
+                      description={recipe.descripcion}
+                      onClick={() => navigate(`/recetas/${recipe.id}`)}
                     />
                   ))
                 ) : (
@@ -221,29 +249,33 @@ const DashboardPage = () => {
                   </thead>
                   <tbody>
                     {inventory && inventory.length > 0 ? (
-                      inventory.map((item) => (
+                      inventory.map((item) => {
+                        const stock = item.stock ?? 0;
+                        const status = stock > 0 ? 'Suficiente' : 'Comprar pronto';
+                        return (
                         <tr key={item.id}>
-                          <td className={styles.inventory_name}>{item.name}</td>
+                          <td className={styles.inventory_name}>{item.ingrediente || item.nombre || '—'}</td>
                           <td>
-                            <span className={styles.inventory_badge}>{item.category}</span>
+                            <span className={styles.inventory_badge}>{item.categoria || item.category || 'General'}</span>
                           </td>
                           <td className={styles.inventory_quantity}>
-                            {item.quantity} {item.unit}
+                            {stock} {item.unidad || 'u'}
                           </td>
                           <td>
                             <div className={styles.inventory_status}>
                               <span
                                 className={`${styles.inventory_status_dot} ${
-                                  item.status === 'Suficiente'
+                                  status === 'Suficiente'
                                     ? styles.status_success
                                     : styles.status_warning
                                 }`}
                               ></span>
-                              <span>{item.status}</span>
+                              <span>{status}</span>
                             </div>
                           </td>
                         </tr>
-                      ))
+                      );
+                      })
                     ) : (
                       <tr>
                         <td colSpan="4" className={styles.empty_message}>

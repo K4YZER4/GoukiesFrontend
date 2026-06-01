@@ -27,7 +27,7 @@
   padding-right: 2.5rem;
   background-color: var(--color-surface-bright);
   border: 2px solid var(--color-outline-variant);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius-full);
   font-family: var(--font-body);
   font-size: var(--font-size-body-md);
   color: var(--color-on-surface);

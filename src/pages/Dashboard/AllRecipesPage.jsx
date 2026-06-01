@@ -5,9 +5,9 @@ import { Header, Navigation, MobileBottomNav } from '../../components/Layout';
 import { RecipeCard } from '../../components/Cards';
 import { LoadingSpinner } from '../../components/Common';
 import { useAuth } from '../../hooks/useAuth';
-import { useToast } from '../../hooks/useToast';
 import recipeService from '../../services/recipeService';
 import { recipeStorage } from '../../utils/localStorage';
+import { normalizeRecipes } from '../../utils/normalizeRecipe';
 
 /**
  * AllRecipesPage Component
@@ -17,11 +17,11 @@ import { recipeStorage } from '../../utils/localStorage';
 const AllRecipesPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { showToast } = useToast();
 
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeMobileTab, setActiveMobileTab] = useState('recipes');
 
@@ -43,15 +43,15 @@ const AllRecipesPage = () => {
           const data = await recipeService.getAllRecipes(user.id);
           
           if (data && Array.isArray(data)) {
-            setRecipes(data);
-            setFilteredRecipes(data);
-            recipeStorage.setAll(data); // Cache the recipes
-            showToast('Recetas actualizado', 'success');
+            const normalized = normalizeRecipes(data);
+            setRecipes(normalized);
+            setFilteredRecipes(normalized);
+            recipeStorage.setAll(normalized); // Cache the normalized data
           }
         }
       } catch (error) {
         console.error('Error loading recipes:', error);
-        showToast('Error al cargar las recetas', 'error');
+        setLoadError(true);
         
         // Use cached data if available
         const cachedRecipes = recipeStorage.getAll();
@@ -65,7 +65,7 @@ const AllRecipesPage = () => {
     };
 
     loadRecipes();
-  }, [user?.id, showToast]);
+  }, [user?.id]);
 
   // Handle search/filter
   useEffect(() => {
@@ -130,6 +130,21 @@ const AllRecipesPage = () => {
               Nueva Receta
             </button>
           </section>
+
+          {loadError && recipes.length === 0 && (
+            <div style={{
+              padding: '1rem',
+              backgroundColor: 'var(--color-error-container)',
+              color: 'var(--color-error)',
+              borderRadius: 'var(--border-radius-md)',
+              fontFamily: 'var(--font-body)',
+              textAlign: 'center',
+              marginBottom: '1rem'
+            }}>
+              <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '0.5rem' }}>error</span>
+              Error al cargar del servidor. Revisa la conexión con el backend.
+            </div>
+          )}
 
           {/* Recipes Grid */}
           <section className={styles.recipes_section}>

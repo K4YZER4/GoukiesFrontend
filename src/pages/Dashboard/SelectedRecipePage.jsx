@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import recipeService from '../../services/recipeService';
 import { recipeStorage } from '../../utils/localStorage';
+import { normalizeRecipe } from '../../utils/normalizeRecipe';
 import styles from './SelectedRecipePage.module.css';
 
 /**
@@ -13,6 +14,10 @@ import styles from './SelectedRecipePage.module.css';
  * Displays detailed view of a single recipe
  * Allows editing and deletion of recipes
  */
+const CLOUDINARY_URL = 'https://res.cloudinary.com/dl90iju4b/';
+
+const isValidImage = (url) => url && url.startsWith(CLOUDINARY_URL);
+
 const SelectedRecipePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -21,6 +26,7 @@ const SelectedRecipePage = () => {
 
   const [recipe, setRecipe] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState('recipes');
 
@@ -47,10 +53,9 @@ const SelectedRecipePage = () => {
         }
       } catch (error) {
         console.error('Error loading recipe:', error);
-        showToast('Error al cargar la receta', 'error');
         
         if (!recipe) {
-          navigate('/recetas');
+          setLoadError(true);
         }
       } finally {
         setIsLoading(false);
@@ -59,35 +64,6 @@ const SelectedRecipePage = () => {
 
     loadRecipe();
   }, [id, user?.id]);
-
-  // Normalize recipe data from API format to component format
-  const normalizeRecipe = (data) => {
-    if (!data) return null;
-    return {
-      id: data.id,
-      nombre: data.nombre || data.title || 'Sin nombre',
-      title: data.nombre || data.title || 'Sin nombre',
-      descripcion: data.descripcion || '',
-      image: data.imagenURL || data.image || null,
-      imagenURL: data.imagenURL || data.image || null,
-      profit: data.profit || 0,
-      porcionesTotales: data.porcionesTotales || data.porciones || 0,
-      ingredientes: Array.isArray(data.ingredientes) 
-        ? data.ingredientes.map(ing => {
-            if (typeof ing === 'string') return ing;
-            const nombre = ing.producto?.ingrediente || ing.nombre || 'Ingrediente';
-            const cantidad = ing.cantidad || '';
-            const unidad = ing.producto?.unidad || ing.unidad || '';
-            return `${cantidad} ${unidad} de ${nombre}`.trim();
-          })
-        : [],
-      pasos: Array.isArray(data.pasos) ? data.pasos : [],
-      instrucciones: Array.isArray(data.pasos) 
-        ? data.pasos.map(p => p.paso || p.descripcion || '')
-        : (Array.isArray(data.instrucciones) ? data.instrucciones : []),
-      notas: data.notas || '',
-    };
-  };
 
   const handleDelete = async () => {
     if (confirm('¿Estás seguro de que deseas eliminar esta receta?')) {
@@ -111,7 +87,7 @@ const SelectedRecipePage = () => {
   };
 
   // Show loading spinner
-  if (isLoading || !recipe) {
+  if (isLoading && !loadError) {
     return (
       <div className={styles.selected_recipe_page}>
         <Header />
@@ -119,6 +95,30 @@ const SelectedRecipePage = () => {
         <div className={styles.recipe_loading}>
           <LoadingSpinner />
         </div>
+      </div>
+    );
+  }
+
+  // Show error/safe state when no recipe available
+  if (!recipe) {
+    return (
+      <div className={styles.selected_recipe_page}>
+        <Header />
+        <Navigation />
+        <main className={styles.recipe_main}>
+          <div className={styles.recipe_container}>
+            <div className={styles.recipe_error_state}>
+              <span className="material-symbols-outlined" style={{ fontSize: '4rem', opacity: 0.4 }}>error</span>
+              <h2>Receta no encontrada</h2>
+              <p>No se pudo cargar la receta. Puede que haya sido eliminada o que tengas problemas de conexión.</p>
+              <button className={styles.recipe_back_btn} onClick={handleBack} style={{ alignSelf: 'center' }}>
+                <span className="material-symbols-outlined">arrow_back</span>
+                Volver a Recetas
+              </button>
+            </div>
+          </div>
+        </main>
+        <MobileBottomNav activeTab={activeMobileTab} onTabChange={setActiveMobileTab} />
       </div>
     );
   }
@@ -143,12 +143,17 @@ const SelectedRecipePage = () => {
           {/* Recipe Header */}
           <section className={styles.recipe_header}>
             <div className={styles.recipe_image_container}>
-              {recipe.image && (
+              {isValidImage(recipe.image) ? (
                 <img
                   src={recipe.image}
                   alt={recipe.title || recipe.nombre}
                   className={styles.recipe_image}
                 />
+              ) : (
+                <div className={styles.recipe_image_placeholder}>
+                  <span className="material-symbols-outlined">image_not_supported</span>
+                  <span>Imagen no proporcionada</span>
+                </div>
               )}
             </div>
 

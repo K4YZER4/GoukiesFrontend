@@ -75,25 +75,31 @@
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   background-color: var(--color-primary);
-  color: var(--color-on-primary);
+  color: white;
   border: none;
+  border-bottom: 3px solid #5b421c;
   border-radius: var(--border-radius-full);
-  font-family: var(--font-button);
-  font-size: var(--font-size-button-text);
-  font-weight: var(--font-weight-bold);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(112, 85, 45, 0.25);
   transition: all var(--transition-normal);
-  box-shadow: var(--shadow-dough);
   flex-shrink: 0;
 }
 
 .products_create_btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-dough-lg);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(112, 85, 45, 0.35);
 }
 
 .products_create_btn:active {
-  transform: translateY(0);
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.products_create_btn .material-symbols-outlined {
+  font-size: 1.25rem;
 }
 
 /* ==========================================
@@ -238,13 +244,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.15);
   border-radius: var(--border-radius-full);
   cursor: pointer;
   transition: all var(--transition-normal);
-  font-size: 1rem;
+  font-size: 1.125rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .action_btn_edit {
@@ -255,18 +263,30 @@
 .action_btn_edit:hover {
   background-color: var(--color-secondary);
   color: var(--color-on-secondary);
-  transform: scale(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.action_btn_edit:active {
+  transform: translateY(1px);
+  border-bottom-width: 1px;
 }
 
 .action_btn_delete {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: var(--color-error-container);
+  color: var(--color-error);
 }
 
 .action_btn_delete:hover {
-  background-color: #ef5350;
-  color: white;
-  transform: scale(1.1);
+  background-color: var(--color-error);
+  color: var(--color-on-error);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.action_btn_delete:active {
+  transform: translateY(1px);
+  border-bottom-width: 1px;
 }
 
 /* ==========================================
@@ -321,21 +341,27 @@
 .products_empty_btn {
   padding: 0.75rem 1.5rem;
   background-color: var(--color-primary);
-  color: var(--color-on-primary);
+  color: white;
   border: none;
+  border-bottom: 3px solid #5b421c;
   border-radius: var(--border-radius-full);
-  font-family: var(--font-button);
-  font-size: var(--font-size-button-text);
-  font-weight: var(--font-weight-bold);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(112, 85, 45, 0.25);
   transition: all var(--transition-normal);
-  box-shadow: var(--shadow-dough);
   margin-top: 0.5rem;
 }
 
 .products_empty_btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-dough-lg);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(112, 85, 45, 0.35);
+}
+
+.products_empty_btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
 }
 
 /* ==========================================

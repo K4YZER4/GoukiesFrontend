@@ -128,8 +128,7 @@ const LoginPage = () => {
               <Input
                 type="text"
                 name="identificador"
-                icon="mail"
-                placeholder="usuario@correo.com o tu_usuario"
+                placeholder="Correo o usuario"
                 value={formData.identificador}
                 onChange={handleInputChange}
                 required
@@ -146,8 +145,7 @@ const LoginPage = () => {
               <Input
                 type="password"
                 name="password"
-                icon="lock"
-                placeholder="••••••••"
+                placeholder="Contraseña"
                 value={formData.password}
                 onChange={handleInputChange}
                 required

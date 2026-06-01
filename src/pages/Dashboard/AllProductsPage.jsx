@@ -21,6 +21,7 @@ const AllProductsPage = () => {
   const [ingredients, setIngredients] = useState([]);
   const [filteredIngredients, setFilteredIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState(''); // For filtering by type
   const [activeMobileTab, setActiveMobileTab] = useState('inventory');
@@ -60,6 +61,7 @@ const AllProductsPage = () => {
         }
       } catch (error) {
         console.error('Error loading ingredients:', error);
+        setLoadError(true);
         
         // Use cached data if available
         const cachedIngredients = ingredientStorage.getAll();
@@ -178,6 +180,21 @@ const AllProductsPage = () => {
                 ))}
               </select>
             </section>
+          )}
+
+          {/* Error Banner */}
+          {loadError && ingredients.length === 0 && (
+            <div style={{
+              padding: '1rem',
+              backgroundColor: 'var(--color-error-container)',
+              color: 'var(--color-error)',
+              borderRadius: 'var(--border-radius-md)',
+              fontFamily: 'var(--font-body)',
+              textAlign: 'center'
+            }}>
+              <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '0.5rem' }}>error</span>
+              Error al cargar desde el servidor. Revisa la conexión con el backend.
+            </div>
           )}
 
           {/* Products Table */}

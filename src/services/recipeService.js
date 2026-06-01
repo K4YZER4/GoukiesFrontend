@@ -23,17 +23,20 @@ const recipeService = {
 
   /**
    * Obtiene una receta específica por ID
+   * Nota: el backend no tiene endpoint directo get-by-id.
+   * Obtenemos todas y filtramos localmente como workaround.
    * @param {string} id - ID de la receta
    * @param {string} id_usuario - ID del usuario autenticado
    * @returns {Promise<Object>} Datos de la receta
    */
   getRecipeById: async (id, id_usuario) => {
     try {
-      const response = await api.post('/recipes/obtain-by-id', { 
-        id, 
-        id_usuario 
-      });
-      return response.data;
+      const allRecipes = await recipeService.getAllRecipes(id_usuario);
+      const recipe = Array.isArray(allRecipes)
+        ? allRecipes.find(r => r.id === id)
+        : null;
+      if (!recipe) throw new Error('Recipe not found');
+      return recipe;
     } catch (error) {
       console.error('Error fetching recipe by ID:', error);
       throw error;
@@ -63,7 +66,7 @@ const recipeService = {
    */
   updateRecipe: async (id, recipeData) => {
     try {
-      const response = await api.post(`/recipes/update/${id}`, recipeData);
+      const response = await api.patch(`/recipes/update/${id}`, recipeData);
       return response.data;
     } catch (error) {
       console.error('Error updating recipe:', error);
@@ -78,7 +81,7 @@ const recipeService = {
    */
   deleteRecipe: async (id) => {
     try {
-      const response = await api.post(`/recipes/delete/${id}`);
+      const response = await api.post('/recipes/delete', { id });
       return response.data;
     } catch (error) {
       console.error('Error deleting recipe:', error);

@@ -151,8 +151,7 @@ const RegisterPage = () => {
               <Input
                 type="text"
                 name="nombre"
-                icon="person"
-                placeholder="Tu nombre"
+                placeholder="Nombre completo"
                 value={formData.nombre}
                 onChange={handleInputChange}
                 required
@@ -169,8 +168,7 @@ const RegisterPage = () => {
               <Input
                 type="email"
                 name="correo_electronico"
-                icon="mail"
-                placeholder="ejemplo@correo.com"
+                placeholder="correo@ejemplo.com"
                 value={formData.correo_electronico}
                 onChange={handleInputChange}
                 required
@@ -187,8 +185,7 @@ const RegisterPage = () => {
               <Input
                 type="password"
                 name="password"
-                icon="lock"
-                placeholder="••••••••"
+                placeholder="Contraseña"
                 value={formData.password}
                 onChange={handleInputChange}
                 required
@@ -205,8 +202,7 @@ const RegisterPage = () => {
               <Input
                 type="password"
                 name="confirmPassword"
-                icon="verified_user"
-                placeholder="••••••••"
+                placeholder="Confirmar contraseña"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 required

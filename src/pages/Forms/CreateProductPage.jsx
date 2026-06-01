@@ -20,14 +20,18 @@ const CreateProductPage = () => {
   const [marcas, setMarcas] = useState([]);
   const [tipos, setTipos] = useState([]);
   const [unidades, setUnidades] = useState([]);
+  const [ingredientes, setIngredientes] = useState([]);
   const [isLoadingGlobalData, setIsLoadingGlobalData] = useState(true);
 
   const [formData, setFormData] = useState({
-    nombre: '',
-    marca_id: '',
-    tipo_id: '',
-    cantidad: '',
-    unidad_id: '',
+    id_ingrediente: '',
+    id_marca: '',
+    id_tipo: '',
+    id_unidad: '',
+    pzas: '',
+    precio_medio: '',
+    cantidad_inventario: '',
+    cantidad_unitario: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,9 +49,15 @@ const CreateProductPage = () => {
           setMarcas(data.marca || []);
           setTipos(data.tipo || []);
           setUnidades(data.unidad || []);
+          setIngredientes(data.ingredientes || []);
           
           // Save to localStorage for caching
-          ingredientStorage.setIngredientsMetadata({ marca: data.marca, tipo: data.tipo, unidad: data.unidad });
+          ingredientStorage.setIngredientsMetadata({
+            marca: data.marca,
+            tipo: data.tipo,
+            unidad: data.unidad,
+            ingredientes: data.ingredientes,
+          });
         }
       } catch (error) {
         console.error('Error loading global data:', error);
@@ -58,6 +68,7 @@ const CreateProductPage = () => {
           setMarcas(cached.marca || []);
           setTipos(cached.tipo || []);
           setUnidades(cached.unidad || []);
+          setIngredientes(cached.ingredientes || []);
         }
       } finally {
         setIsLoadingGlobalData(false);
@@ -78,43 +89,44 @@ const CreateProductPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
-    if (!formData.nombre.trim()) {
-      showToast('El nombre del ingrediente es requerido', 'error');
+    if (!formData.id_ingrediente) {
+      showToast('Selecciona un ingrediente', 'error');
       return;
     }
 
-    if (!formData.marca_id) {
+    if (!formData.id_marca) {
       showToast('Selecciona una marca', 'error');
       return;
     }
 
-    if (!formData.tipo_id) {
+    if (!formData.id_tipo) {
       showToast('Selecciona un tipo de ingrediente', 'error');
       return;
     }
 
-    if (!formData.cantidad || isNaN(formData.cantidad)) {
-      showToast('La cantidad debe ser un número válido', 'error');
+    if (!formData.id_unidad) {
+      showToast('Selecciona una unidad de medida', 'error');
       return;
     }
 
-    if (!formData.unidad_id) {
-      showToast('Selecciona una unidad de medida', 'error');
+    if (!formData.cantidad_inventario || isNaN(formData.cantidad_inventario)) {
+      showToast('La cantidad en inventario debe ser un número válido', 'error');
       return;
     }
 
     try {
       setIsSubmitting(true);
 
-      // Prepare data for API - usando IDs de los datos maestros
       const ingredientData = {
         id_usuario: user.id,
-        nombre: formData.nombre,
-        marca_id: parseInt(formData.marca_id),
-        tipo_id: parseInt(formData.tipo_id),
-        cantidad: parseFloat(formData.cantidad),
-        unidad_id: parseInt(formData.unidad_id),
+        id_ingrediente: parseInt(formData.id_ingrediente),
+        id_marca: parseInt(formData.id_marca),
+        id_tipo: parseInt(formData.id_tipo),
+        id_unidad: parseInt(formData.id_unidad),
+        pzas: parseInt(formData.pzas) || 1,
+        precio_medio: parseFloat(formData.precio_medio) || 0,
+        cantidad_inventario: parseFloat(formData.cantidad_inventario) || 0,
+        cantidad_unitario: parseInt(formData.cantidad_unitario) || 1,
       };
 
       // Call API to create ingredient
@@ -123,17 +135,19 @@ const CreateProductPage = () => {
       if (response) {
         showToast('¡Ingrediente añadido exitosamente!', 'success');
         
-        // Update local cache
-        const cachedIngredients = ingredientStorage.getAll() || [];
-        ingredientStorage.setAll([...cachedIngredients, response]);
+        // No actualizamos caché aquí porque el response tiene field names distintos
+        // El inventario cargará los datos frescos via API al navegar a /inventario
 
         // Reset form and redirect
         setFormData({
-          nombre: '',
-          marca_id: '',
-          tipo_id: '',
-          cantidad: '',
-          unidad_id: '',
+          id_ingrediente: '',
+          id_marca: '',
+          id_tipo: '',
+          id_unidad: '',
+          pzas: '',
+          precio_medio: '',
+          cantidad_inventario: '',
+          cantidad_unitario: '',
         });
 
         // Redirect to inventory page
@@ -179,7 +193,8 @@ const CreateProductPage = () => {
   };
 
   const handleCancel = () => {
-    if (formData.nombre || formData.marca_id || formData.tipo_id || formData.cantidad) {
+    const hasChanges = Object.values(formData).some(v => v !== '');
+    if (hasChanges) {
       if (confirm('¿Descartar cambios?')) {
         navigate('/inventario');
       }
@@ -230,68 +245,126 @@ const CreateProductPage = () => {
             <div className={styles.form_grid}>
               {/* Ingredient Name */}
               <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="nombre">
-                  Nombre del Ingrediente
+                <label className={styles.form_label} htmlFor="id_ingrediente">
+                  Ingrediente
                 </label>
-                <Input
-                  id="nombre"
-                  name="nombre"
-                  placeholder="p. ej., Harina de Trigo"
-                  value={formData.nombre}
+                <Select
+                  id="id_ingrediente"
+                  name="id_ingrediente"
+                  value={formData.id_ingrediente}
                   onChange={handleInputChange}
+                  options={[
+                    { value: '', label: 'Selecciona un ingrediente' },
+                    ...ingredientes.map(i => ({ value: i.id.toString(), label: i.nombre })),
+                  ]}
                   fullWidth
                 />
               </div>
 
                {/* Brand */}
                <div className={styles.form_group}>
-                 <label className={styles.form_label} htmlFor="marca_id">
-                   Marca
-                 </label>
-                 <Select
-                   id="marca_id"
-                   name="marca_id"
-                   value={formData.marca_id}
-                   onChange={handleInputChange}
-                   options={[
-                     { value: '', label: 'Selecciona una marca' },
-                     ...marcas.map(marca => ({ value: marca.id.toString(), label: marca.nombre })),
-                   ]}
-                   fullWidth
-                 />
+                  <label className={styles.form_label} htmlFor="id_marca">
+                    Marca
+                  </label>
+                  <Select
+                    id="id_marca"
+                    name="id_marca"
+                    value={formData.id_marca}
+                    onChange={handleInputChange}
+                    options={[
+                      { value: '', label: 'Selecciona una marca' },
+                      ...marcas.map(marca => ({ value: marca.id.toString(), label: marca.nombre })),
+                    ]}
+                    fullWidth
+                  />
                </div>
 
                {/* Type */}
                <div className={styles.form_group}>
-                 <label className={styles.form_label} htmlFor="tipo_id">
-                   Tipo de Ingrediente
-                 </label>
-                 <Select
-                   id="tipo_id"
-                   name="tipo_id"
-                   value={formData.tipo_id}
-                   onChange={handleInputChange}
-                   options={[
-                     { value: '', label: 'Selecciona un tipo' },
-                     ...tipos.map(tipo => ({ value: tipo.id.toString(), label: tipo.nombre })),
-                   ]}
-                   fullWidth
-                 />
+                  <label className={styles.form_label} htmlFor="id_tipo">
+                    Tipo de Ingrediente
+                  </label>
+                  <Select
+                    id="id_tipo"
+                    name="id_tipo"
+                    value={formData.id_tipo}
+                    onChange={handleInputChange}
+                    options={[
+                      { value: '', label: 'Selecciona un tipo' },
+                      ...tipos.map(tipo => ({ value: tipo.id.toString(), label: tipo.nombre })),
+                    ]}
+                    fullWidth
+                  />
                </div>
 
-              {/* Quantity */}
+               {/* Unit */}
+               <div className={styles.form_group}>
+                  <label className={styles.form_label} htmlFor="id_unidad">
+                    Unidad de Medida
+                  </label>
+                  <Select
+                    id="id_unidad"
+                    name="id_unidad"
+                    value={formData.id_unidad}
+                    onChange={handleInputChange}
+                    options={[
+                      { value: '', label: 'Selecciona una unidad' },
+                      ...unidades.map(unidad => ({ value: unidad.id.toString(), label: unidad.nombre })),
+                    ]}
+                    fullWidth
+                  />
+               </div>
+
+              {/* Pieces */}
               <div className={styles.form_group}>
-                <label className={styles.form_label} htmlFor="cantidad">
-                  Cantidad
+                <label className={styles.form_label} htmlFor="pzas">
+                  Piezas
+                </label>
+                <Input
+                  id="pzas"
+                  name="pzas"
+                  type="number"
+                  min="1"
+                  placeholder="1"
+                  value={formData.pzas}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              {/* Precio Medio */}
+              <div className={styles.form_group}>
+                <label className={styles.form_label} htmlFor="precio_medio">
+                  Precio Medio
                 </label>
                 <div className={styles.input_with_icon}>
                   <Input
-                    id="cantidad"
-                    name="cantidad"
+                    id="precio_medio"
+                    name="precio_medio"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={formData.precio_medio}
+                    onChange={handleInputChange}
+                  />
+                  <span className={`${styles.input_icon} material-symbols-outlined`}>
+                    attach_money
+                  </span>
+                </div>
+              </div>
+
+              {/* Cantidad en inventario */}
+              <div className={styles.form_group}>
+                <label className={styles.form_label} htmlFor="cantidad_inventario">
+                  Cantidad en Inventario
+                </label>
+                <div className={styles.input_with_icon}>
+                  <Input
+                    id="cantidad_inventario"
+                    name="cantidad_inventario"
                     type="number"
                     step="0.1"
                     placeholder="0"
-                    value={formData.cantidad}
+                    value={formData.cantidad_inventario}
                     onChange={handleInputChange}
                   />
                   <span className={`${styles.input_icon} material-symbols-outlined`}>
@@ -300,22 +373,21 @@ const CreateProductPage = () => {
                 </div>
               </div>
 
-               {/* Unit */}
-               <div className={styles.form_group}>
-                 <label className={styles.form_label} htmlFor="unidad_id">
-                   Unidad de Medida
-                 </label>
-                 <Select
-                   id="unidad_id"
-                   name="unidad_id"
-                   value={formData.unidad_id}
-                   onChange={handleInputChange}
-                   options={[
-                     { value: '', label: 'Selecciona una unidad' },
-                     ...unidades.map(unidad => ({ value: unidad.id.toString(), label: unidad.nombre })),
-                   ]}
-                 />
-               </div>
+              {/* Cantidad unitario */}
+              <div className={styles.form_group}>
+                <label className={styles.form_label} htmlFor="cantidad_unitario">
+                  Cantidad Unitaria
+                </label>
+                <Input
+                  id="cantidad_unitario"
+                  name="cantidad_unitario"
+                  type="number"
+                  min="1"
+                  placeholder="1"
+                  value={formData.cantidad_unitario}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
 
             {/* Actions */}
