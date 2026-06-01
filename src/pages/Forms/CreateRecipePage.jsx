@@ -47,6 +47,10 @@ const CreateRecipePage = () => {
         setIsLoadingInventory(true);
         if (user?.id) {
           const data = await ingredientService.getAllIngredients(user.id);
+          console.log('📦 Inventory data from API:', { 
+            productos: data?.producto?.length || 0, 
+            firstProduct: data?.producto?.[0] 
+          });
           if (data && data.producto) {
             setInventoryData(data.producto);
           }
@@ -215,10 +219,13 @@ const CreateRecipePage = () => {
         idUsuario: user.id,
         ingredientes: formData.ingredientes
           .filter(ing => ing.nombre && ing.id)
-          .map(ing => ({
-            id_producto: ing.id,
-            cantidad: parseFloat(ing.cantidad) || 0,
-          })),
+          .map(ing => {
+            console.log('📦 Ingredient being sent:', { id: ing.id, nombre: ing.nombre });
+            return {
+              id_producto: ing.id,
+              cantidad: parseFloat(ing.cantidad) || 0,
+            };
+          }),
         pasos: formData.instrucciones
           .filter(inst => inst.descripcion)
           .map((inst, index) => ({
