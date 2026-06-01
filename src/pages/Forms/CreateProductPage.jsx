@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './CreateProductPage.module.css';
 import { Header, Navigation } from '../../components/Layout';
 import { Input, Select } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
-import { useMasterData } from '../../hooks/useMasterData';
 import ingredientService from '../../services/ingredientService';
 import { ingredientStorage } from '../../utils/localStorage';
 
@@ -17,7 +16,11 @@ const CreateProductPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
-  const { marcas, tipos, unidades, isLoading: isMasterDataLoading } = useMasterData();
+
+  const [marcas, setMarcas] = useState([]);
+  const [tipos, setTipos] = useState([]);
+  const [unidades, setUnidades] = useState([]);
+  const [isLoadingGlobalData, setIsLoadingGlobalData] = useState(true);
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -28,6 +31,41 @@ const CreateProductPage = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Load global data (marcas, tipos, unidades) on mount
+  useEffect(() => {
+    const loadGlobalData = async () => {
+      if (!user?.id) return;
+      
+      try {
+        setIsLoadingGlobalData(true);
+        const data = await ingredientService.getAllIngredients(user.id);
+        
+        if (data) {
+          setMarcas(data.marca || []);
+          setTipos(data.tipo || []);
+          setUnidades(data.unidad || []);
+          
+          // Save to localStorage for caching
+          ingredientStorage.setIngredientsMetadata({ marca: data.marca, tipo: data.tipo, unidad: data.unidad });
+        }
+      } catch (error) {
+        console.error('Error loading global data:', error);
+        
+        // Try to load from cache
+        const cached = ingredientStorage.getIngredientsMetadata();
+        if (cached) {
+          setMarcas(cached.marca || []);
+          setTipos(cached.tipo || []);
+          setUnidades(cached.unidad || []);
+        }
+      } finally {
+        setIsLoadingGlobalData(false);
+      }
+    };
+
+    loadGlobalData();
+  }, [user?.id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
