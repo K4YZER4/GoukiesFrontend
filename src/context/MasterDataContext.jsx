@@ -29,23 +29,33 @@ export const MasterDataProvider = ({ children }) => {
       // Verificar si hay datos en caché
       const cachedData = masterDataStorage.getMasterData();
       if (cachedData && cachedData.marca && cachedData.marca.length > 0) {
+        console.log('✓ Master data loaded from cache');
         setMasterData(cachedData);
         return;
       }
 
       // Cargar desde API
+      console.log('📡 Fetching master data from API...');
       const data = await masterDataService.getAllMasterData();
+      
       if (data) {
+        console.log('✓ Master data fetched:', {
+          marcas: data.marca?.length,
+          tipos: data.tipo?.length,
+          unidades: data.unidad?.length,
+          ingredientes: data.ingredientes?.length,
+        });
         setMasterData(data);
         masterDataStorage.setMasterData(data);
       }
     } catch (err) {
-      console.error('Error loading master data:', err);
+      console.error('❌ Error loading master data:', err);
       setError(err.message);
       
       // Intentar usar datos en caché si hay error
       const cachedData = masterDataStorage.getMasterData();
       if (cachedData) {
+        console.log('⚠️ Using cached master data due to error');
         setMasterData(cachedData);
       }
     } finally {

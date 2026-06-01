@@ -5,6 +5,8 @@
  * - Tipos (product types)
  * - Unidades (measurement units)
  * - Ingredientes (ingredients - también globales para selection)
+ * 
+ * Usa el endpoint /ingredients/obtain-all con id_usuario = null o sin parámetro
  */
 
 import api from './api';
@@ -12,13 +14,13 @@ import api from './api';
 export const masterDataService = {
   /**
    * Obtiene todos los datos maestros (marcas, tipos, unidades, ingredientes)
-   * Endpoint: POST /products/obtain-all o similar
-   * @returns {Promise<Object>} { marca, tipo, unidad, ingredientes }
+   * Endpoint: POST /ingredients/obtain-all (sin id_usuario o con null)
+   * @returns {Promise<Object>} { marca, tipo, unidad, ingredientes, producto }
    */
   getAllMasterData: async () => {
     try {
-      // Ajusta este endpoint según tu API
-      const response = await api.post('/products/obtain-all', {});
+      // Llamar sin id_usuario para obtener solo datos globales
+      const response = await api.post('/ingredients/obtain-all', {});
       return response.data;
     } catch (error) {
       console.error('Error fetching master data:', error);
